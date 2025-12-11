@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary brand colors based on Himsog logo -->
+    <color name="colorPrimary">#0EA5E9</color>        <!-- Cyan-500 -->
+    <color name="colorPrimaryDark">#0284C7</color>    <!-- Cyan-600 -->
+    <color name="colorAccent">#3B82F6</color>         <!-- Blue-500 -->
+
+    <!-- Splash screen gradient colors -->
+    <color name="splash_start">#06B6D4</color>        <!-- Cyan-500 -->
+    <color name="splash_center">#3B82F6</color>       <!-- Blue-500 -->
+    <color name="splash_end">#1E40AF</color>          <!-- Blue-800 -->
+    <color name="splash_background">#1E40AF</color>   <!-- Fallback -->
+
+    <!-- Text colors -->
+    <color name="white">#FFFFFF</color>
+</resources>

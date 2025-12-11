@@ -1,0 +1,704 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/lib/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  PROVIDER
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum ProviderStatus {
+  PENDING
+  VERIFIED
+  SUSPENDED
+  REJECTED
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+model User {
+  id            String     @id @default(uuid())
+  name          String
+  email         String
+  role          UserRole   @default(USER)
+  status        UserStatus @default(ACTIVE)
+  emailVerified Boolean    @default(false)
+  image         String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @default(now()) @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  // Suspension tracking
+  suspendedAt    DateTime? @map("suspended_at")
+  suspendReason  String?   @map("suspend_reason")
+  suspendedById  String?   @map("suspended_by_id")
+  suspendedBy    User?     @relation("SuspendedUsers", fields: [suspendedById], references: [id], onDelete: SetNull)
+  suspendedUsers User[]    @relation("SuspendedUsers")
+
+  // Provider relationships
+  provider          Provider?  @relation("UserProvider")
+  verifiedProviders Provider[] @relation("ProviderVerifier")
+
+  // Appointment relationships
+  appointments          Appointment[] @relation("UserAppointments")
+  cancelledAppointments Appointment[] @relation("AppointmentCanceller")
+
+  // Notification relationships
+  notifications Notification[]
+
+  // Messaging relationships
+  conversationsAsUser1 Conversation[] @relation("ConversationUser1")
+  conversationsAsUser2 Conversation[] @relation("ConversationUser2")
+  sentMessages         Message[]      @relation("MessageSender")
+
+  // Review relationships
+  reviews     Review[]     @relation("UserReviews")
+  reviewLikes ReviewLike[] @relation("UserReviewLikes")
+
+  // System feedback relationships
+  feedbackSubmitted SystemFeedback[] @relation("UserFeedback")
+  feedbackResponses SystemFeedback[] @relation("FeedbackResponder")
+
+  // Admin audit relationships
+  auditLogs             AuditLog[]              @relation("AuditLogAdmin")
+  providerStatusChanges ProviderStatusHistory[] @relation("StatusChanger")
+  verifiedDocuments     Document[]              @relation("DocumentVerifier")
+
+  @@unique([email])
+  @@index([status])
+  @@index([role, status])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId, expiresAt]) // For session lookups and cleanup
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId]) // For OAuth account lookups
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@map("verification")
+}
+
+// ============================================================================
+// CATEGORIES & PROVIDERS
+// ============================================================================
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?
+  icon        String?
+  color       String   @default("#3B82F6") @db.VarChar(7)
+  isActive    Boolean  @default(true) @map("is_active")
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  providers Provider[]
+
+  @@map("categories")
+}
+
+model Provider {
+  id             String         @id @default(uuid())
+  userId         String         @unique @map("user_id")
+  categoryId     String?        @map("category_id")
+  verifiedBy     String?        @map("verified_by")
+  healthcareName String         @map("healthcare_name")
+  description    String?
+  phoneNumber    String?        @map("phone_number")
+  email          String?
+  coverPhoto     String?        @map("cover_photo")
+  status         ProviderStatus @default(PENDING)
+
+  // Location
+  address   String
+  city      String   @default("Digos")
+  province  String   @default("Davao del Sur")
+  latitude  Decimal? @db.Decimal(10, 8)
+  longitude Decimal? @db.Decimal(11, 8)
+
+  // Scheduling
+  slotDuration Int @default(30) @map("slot_duration_minutes")
+
+  // Verification
+  verifiedAt DateTime? @map("verified_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  // Relationships
+  user     User      @relation("UserProvider", fields: [userId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id])
+  verifier User?     @relation("ProviderVerifier", fields: [verifiedBy], references: [id], onDelete: SetNull)
+
+  services       Service[]
+  operatingHours OperatingHour[]
+  appointments   Appointment[]
+  documents      Document[]
+  breakTimes     BreakTime[]
+  notifications  Notification[]
+  reviews        Review[]
+
+  // Admin tracking
+  statusHistory ProviderStatusHistory[]
+
+  @@index([userId, categoryId, status])
+  @@index([healthcareName, city, province])
+  @@map("providers")
+}
+
+// ============================================================================
+// SERVICES
+// ============================================================================
+// 1. Add this Enum to track the top toggle (Single vs Package)
+enum ServiceType {
+  SINGLE
+  PACKAGE
+}
+
+// 2. Add this Enum to track the Pricing Model toggle
+enum PricingModel {
+  FIXED
+  RANGE
+}
+
+model Service {
+  id           String       @id @default(uuid())
+  providerId   String       @map("provider_id")
+  name         String
+  description  String?
+  type         ServiceType  @default(SINGLE)
+  pricingModel PricingModel @default(FIXED) // Matches your radio button
+  fixedPrice   Int          @default(0) @map("fixed_price")
+  priceMin     Int          @default(0) @map("price_min")
+  priceMax     Int          @default(0) @map("price_max")
+  isActive     Boolean      @default(true) @map("is_active")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  // Relationships
+  provider     Provider             @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  appointments AppointmentService[]
+
+  // PACKAGE LOGIC (Self-Relation)
+  // If type is PACKAGE, this list holds the services inside it (the "Included Services" input)
+  includedServices ServicePackage[] @relation("PackageParent")
+
+  // If type is SINGLE, this list tracks which packages this service belongs to
+  partOfPackages ServicePackage[] @relation("PackageChild")
+
+  // INSURANCE / PAYMENTS (The chips at the bottom)
+  acceptedInsurances ServiceInsurance[]
+
+  @@index([providerId, name, isActive])
+  @@index([priceMin, priceMax])
+  @@map("services")
+}
+
+// Join table for "Included Services" in a Package
+model ServicePackage {
+  parentPackageId String @map("parent_package_id")
+  childServiceId  String @map("child_service_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  parentPackage Service @relation("PackageParent", fields: [parentPackageId], references: [id], onDelete: Cascade)
+  childService  Service @relation("PackageChild", fields: [childServiceId], references: [id], onDelete: Cascade)
+
+  @@id([parentPackageId, childServiceId])
+  @@map("service_packages")
+}
+
+// ============================================================================
+// INSURANCE & PAYMENT OPTIONS
+// ============================================================================
+
+// Master list (PhilHealth, SSS, Maxicare, Cash Only, etc.)
+model InsuranceProvider {
+  id       String  @id @default(uuid())
+  name     String  @unique
+  isActive Boolean @default(true)
+
+  // Relations
+  services ServiceInsurance[]
+
+  @@map("insurance_providers")
+}
+
+// Join table for Services <-> Insurance
+model ServiceInsurance {
+  serviceId           String @map("service_id")
+  insuranceProviderId String @map("insurance_provider_id")
+
+  service           Service           @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  insuranceProvider InsuranceProvider @relation(fields: [insuranceProviderId], references: [id], onDelete: Cascade)
+
+  @@id([serviceId, insuranceProviderId])
+  @@map("service_insurances")
+}
+
+// ============================================================================
+// SCHEDULING
+// ============================================================================
+
+model OperatingHour {
+  id         String @id @default(uuid())
+  providerId String @map("provider_id")
+  dayOfWeek  Int    @map("day_of_week") // 0=Sunday, 1=Monday, etc.
+
+  // Change DateTime to String
+  startTime String? @map("start_time")
+  endTime   String? @map("end_time")
+
+  isClosed  Boolean  @default(false) @map("is_closed")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@index([providerId, dayOfWeek]) // For schedule queries
+  @@map("operating_hours")
+}
+
+model BreakTime {
+  id         String   @id @default(uuid())
+  providerId String   @map("provider_id")
+  name       String   @default("Lunch Break")
+  dayOfWeek  Int      @map("day_of_week")
+  // UPDATED: Use String for 24h format
+  startTime  String   @map("start_time") // "12:00"
+  endTime    String   @map("end_time") // "13:00"
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@index([providerId, dayOfWeek]) // For break time lookup during conflict detection
+  @@map("break_times")
+}
+
+// ============================================================================
+// APPOINTMENTS
+// ============================================================================
+
+model Appointment {
+  id                String            @id @default(uuid())
+  appointmentNumber String            @unique @map("appointment_number")
+  userId            String            @map("user_id")
+  providerId        String            @map("provider_id")
+  startTime         DateTime          @map("start_time") @db.Timestamptz(6)
+  endTime           DateTime          @map("end_time") @db.Timestamptz(6)
+  status            AppointmentStatus @default(PENDING)
+  notes             String?
+  totalPrice        Decimal           @map("total_price") @db.Decimal(10, 2)
+
+  // Patient contact information (from appointment form)
+  patientName  String  @map("patient_name")
+  patientEmail String  @map("patient_email")
+  patientPhone String? @map("patient_phone")
+
+  // Completion tracking (activity summary from provider)
+  activityNotes String? @map("activity_notes") @db.Text
+
+  // Cancellation tracking
+  cancelledAt        DateTime? @map("cancelled_at")
+  cancellationReason String?   @map("cancellation_reason")
+  cancelledBy        String?   @map("cancelled_by")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  user      User     @relation("UserAppointments", fields: [userId], references: [id], onDelete: Cascade)
+  provider  Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  canceller User?    @relation("AppointmentCanceller", fields: [cancelledBy], references: [id], onDelete: SetNull)
+
+  services      AppointmentService[]
+  notifications Notification[]
+  review        Review?
+
+  @@index([providerId, startTime, endTime])
+  @@index([providerId, status, startTime, endTime]) // Optimized for conflict detection
+  @@index([userId, status])
+  @@index([userId, createdAt]) // For user appointment history
+  @@map("appointments")
+}
+
+model AppointmentService {
+  appointmentId  String   @map("appointment_id")
+  serviceId      String   @map("service_id")
+  priceAtBooking Decimal  @map("price_at_booking") @db.Decimal(10, 2)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  service     Service     @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@id([appointmentId, serviceId])
+  @@map("appointment_service")
+}
+
+// ============================================================================
+// DOCUMENTS
+// ============================================================================
+
+enum DocumentVerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+model Document {
+  id           String    @id @default(uuid())
+  providerId   String    @map("provider_id")
+  documentType String    @map("document_type")
+  filePath     String    @map("file_path")
+  verifiedAt   DateTime? @map("verified_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  // Verification tracking
+  verificationStatus DocumentVerificationStatus @default(PENDING) @map("verification_status")
+  verifiedById       String?                    @map("verified_by_id")
+  verifiedBy         User?                      @relation("DocumentVerifier", fields: [verifiedById], references: [id], onDelete: SetNull)
+  rejectionReason    String?                    @map("rejection_reason")
+
+  // Relationships
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@index([providerId, verificationStatus])
+  @@map("documents")
+}
+
+// ============================================================================
+// NOTIFICATIONS
+// ============================================================================
+
+enum NotificationType {
+  APPOINTMENT_CREATED
+  APPOINTMENT_CONFIRMED
+  APPOINTMENT_CANCELLED
+  APPOINTMENT_REMINDER
+  PROVIDER_VERIFIED
+  PROVIDER_REJECTED
+  PROVIDER_SUSPENDED
+  PROVIDER_REACTIVATED
+  ACCOUNT_SUSPENDED
+  ACCOUNT_REACTIVATED
+  REVIEW_RECEIVED
+  REVIEW_RESPONSE
+}
+
+model Notification {
+  id      String           @id @default(uuid())
+  userId  String           @map("user_id")
+  type    NotificationType
+  title   String
+  message String
+  isRead  Boolean          @default(false) @map("is_read")
+
+  // Optional appointment reference
+  appointmentId String? @map("appointment_id")
+
+  // Optional provider reference
+  providerId String? @map("provider_id")
+
+  // Additional metadata (e.g., rejection reason, action details)
+  metadata Json? @db.JsonB
+
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  // Relationships
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  provider    Provider?    @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead, createdAt])
+  @@index([appointmentId])
+  @@index([providerId, createdAt]) // For provider notification history
+  @@map("notifications")
+}
+
+// ============================================================================
+// PRIVATE MESSAGING
+// ============================================================================
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+}
+
+// Conversation between two users (1-to-1 private chat)
+model Conversation {
+  id String @id @default(uuid())
+
+  // Two participants in the conversation
+  user1Id String @map("user1_id")
+  user2Id String @map("user2_id")
+
+  // Last message info for quick access
+  lastMessageAt      DateTime? @map("last_message_at")
+  lastMessageContent String?   @map("last_message_content")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  user1    User      @relation("ConversationUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2    User      @relation("ConversationUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  // Ensure unique conversation between two users (regardless of order)
+  @@unique([user1Id, user2Id])
+  @@index([user1Id, lastMessageAt])
+  @@index([user2Id, lastMessageAt])
+  @@map("conversations")
+}
+
+// Individual messages within a conversation
+model Message {
+  id             String        @id @default(uuid())
+  conversationId String        @map("conversation_id")
+  senderId       String        @map("sender_id")
+  content        String        @db.Text
+  status         MessageStatus @default(SENT)
+
+  // Read tracking
+  readAt DateTime? @map("read_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@index([senderId, createdAt])
+  @@map("messages")
+}
+
+// ============================================================================
+// REVIEWS & RATINGS
+// ============================================================================
+
+model Review {
+  id            String @id @default(uuid())
+  appointmentId String @unique @map("appointment_id") // One review per appointment
+  userId        String @map("user_id") // Who wrote the review
+  providerId    String @map("provider_id") // Who is being reviewed
+
+  // Rating fields
+  rating      Int     @db.SmallInt // 1-5 stars (required)
+  comment     String? @db.Text // Written review (optional)
+  isAnonymous Boolean @default(false) @map("is_anonymous") // Anonymous review option
+
+  // Optional category ratings (1-5 stars each)
+  professionalismRating Int? @map("professionalism_rating") @db.SmallInt
+  cleanlinessRating     Int? @map("cleanliness_rating") @db.SmallInt
+  waitTimeRating        Int? @map("wait_time_rating") @db.SmallInt
+  valueRating           Int? @map("value_rating") @db.SmallInt
+
+  // Provider response
+  providerResponse String?   @map("provider_response") @db.Text
+  respondedAt      DateTime? @map("responded_at")
+
+  // Metadata
+  isEdited  Boolean   @default(false) @map("is_edited")
+  editedAt  DateTime? @map("edited_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  // Relationships
+  appointment Appointment  @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  user        User         @relation("UserReviews", fields: [userId], references: [id], onDelete: Cascade)
+  provider    Provider     @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  likes       ReviewLike[]
+
+  @@index([providerId, rating, createdAt])
+  @@index([userId])
+  @@map("reviews")
+}
+
+// Review likes - tracks which users liked which reviews
+model ReviewLike {
+  id        String   @id @default(uuid())
+  reviewId  String   @map("review_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relationships
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User   @relation("UserReviewLikes", fields: [userId], references: [id], onDelete: Cascade)
+
+  // Each user can only like a review once
+  @@unique([reviewId, userId])
+  @@index([reviewId])
+  @@index([userId])
+  @@map("review_likes")
+}
+
+// ============================================================================
+// ADMIN AUDIT & TRACKING
+// ============================================================================
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  adminId    String   @map("admin_id")
+  action     String // e.g., "PROVIDER_STATUS_CHANGED", "USER_SUSPENDED"
+  targetType String   @map("target_type") // e.g., "Provider", "User", "Category"
+  targetId   String   @map("target_id")
+  oldValue   Json?    @map("old_value") @db.JsonB
+  newValue   Json?    @map("new_value") @db.JsonB
+  metadata   Json?    @db.JsonB
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relationships
+  admin User @relation("AuditLogAdmin", fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+  @@index([action])
+  @@map("audit_logs")
+}
+
+model ProviderStatusHistory {
+  id          String         @id @default(uuid())
+  providerId  String         @map("provider_id")
+  fromStatus  ProviderStatus @map("from_status")
+  toStatus    ProviderStatus @map("to_status")
+  reason      String?
+  changedById String         @map("changed_by_id")
+  createdAt   DateTime       @default(now()) @map("created_at")
+
+  // Relationships
+  provider  Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  changedBy User     @relation("StatusChanger", fields: [changedById], references: [id], onDelete: Cascade)
+
+  @@index([providerId])
+  @@index([createdAt])
+  @@map("provider_status_history")
+}
+
+// ============================================================================
+// SYSTEM FEEDBACK
+// ============================================================================
+
+enum FeedbackCategory {
+  FEATURE_REQUEST
+  BUG_REPORT
+  IMPROVEMENT
+  USER_EXPERIENCE
+  OTHER
+}
+
+enum FeedbackPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model SystemFeedback {
+  id       String            @id @default(uuid())
+  userId   String            @map("user_id")
+  category FeedbackCategory
+  priority FeedbackPriority? @default(MEDIUM)
+  title    String
+  message  String            @db.Text
+
+  // Optional rating for overall satisfaction (1-5)
+  satisfactionRating Int? @map("satisfaction_rating") @db.SmallInt
+
+  // Admin response
+  adminResponse String?   @map("admin_response") @db.Text
+  respondedAt   DateTime? @map("responded_at")
+  respondedById String?   @map("responded_by_id")
+
+  // Status tracking
+  isRead     Boolean   @default(false) @map("is_read")
+  isResolved Boolean   @default(false) @map("is_resolved")
+  resolvedAt DateTime? @map("resolved_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  user        User  @relation("UserFeedback", fields: [userId], references: [id], onDelete: Cascade)
+  respondedBy User? @relation("FeedbackResponder", fields: [respondedById], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([category])
+  @@index([isRead, isResolved])
+  @@index([isResolved, createdAt]) // For admin pending feedback queries
+  @@index([createdAt])
+  @@map("system_feedback")
+}

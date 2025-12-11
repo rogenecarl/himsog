@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "appointments" ALTER COLUMN "start_time" SET DATA TYPE TIMESTAMPTZ(6),
+ALTER COLUMN "end_time" SET DATA TYPE TIMESTAMPTZ(6);
