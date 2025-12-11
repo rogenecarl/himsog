@@ -1,0 +1,61 @@
+name: Deploy to Azure App Service
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: himsog-app # Change this to your Azure Web App name
+  NODE_VERSION: "20.x"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: bunx prisma generate
+
+      - name: Build Next.js app
+        run: bun run build
+        env:
+          # These are needed at build time for Next.js
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+      - name: Prepare standalone output
+        run: |
+          # Copy public folder to standalone
+          cp -r public .next/standalone/public
+
+          # Copy static files
+          cp -r .next/static .next/standalone/.next/static
+
+          # Copy Prisma generated client
+          mkdir -p .next/standalone/src/lib/generated
+          cp -r src/lib/generated/prisma .next/standalone/src/lib/generated/
+
+          # Create package.json for Azure
+          echo '{"name":"himsog","version":"1.0.0","scripts":{"start":"node server.js"}}' > .next/standalone/package.json
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: .next/standalone

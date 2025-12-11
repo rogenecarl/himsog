@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Required for Azure App Service deployment
+  output: "standalone",
+
   experimental: {
     serverActions: {
       bodySizeLimit: "4mb",
