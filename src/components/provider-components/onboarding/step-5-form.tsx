@@ -15,6 +15,9 @@ import {
   Loader2,
   Upload,
   X,
+  Sparkles,
+  CheckCircle2,
+  Info,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useCallback } from "react";
@@ -22,6 +25,8 @@ import { useCreateProviderProfile } from "@/hooks/use-create-provider-profile";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
+import { OnboardingStepper } from "./onboarding-stepper";
+import { cn } from "@/lib/utils";
 
 const onboardingInfoFormSchema = z.object({
   coverPhoto: z.any().nullable().optional(),
@@ -189,17 +194,20 @@ export default function OnboardingSummaryForm() {
   }, [providerData, createProviderMutation, form, clearSelectedFile]);
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-4 sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-4xl px-4 sm:px-6 lg:px-8 py-6">
+      {/* Progress Stepper */}
+      <OnboardingStepper currentStep={5} />
+
       {/* Header Section */}
       <div className="mb-8 text-center">
-        <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
-          <ImageIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+        <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 shadow-lg shadow-indigo-500/25">
+          <CheckCircle2 className="h-7 w-7 text-white" />
         </div>
         <h1 className="mb-2 text-2xl font-bold sm:text-3xl text-slate-900 dark:text-white">
-          Complete Your Profile
+          Almost Done!
         </h1>
-        <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-          Add a cover photo to make your profile stand out to potential clients
+        <p className="text-slate-600 dark:text-slate-400 max-w-lg mx-auto text-sm sm:text-base">
+          Add a cover photo to complete your profile and attract more patients
         </p>
       </div>
 
@@ -207,156 +215,157 @@ export default function OnboardingSummaryForm() {
         e.preventDefault();
         handleSubmit(onSubmit)(e);
       }} className="space-y-6">
-        <Card className="overflow-hidden border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800">
-          <CardContent className="p-6 sm:p-8">
+        <Card className="overflow-hidden border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800/50 shadow-sm">
+          <CardContent className="p-6">
             {/* Section Header */}
-            <div className="mb-6 flex items-center gap-3">
-              <div className="rounded-lg bg-blue-100 dark:bg-blue-900/30 p-2">
-                <ImageIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-900/30">
+                <ImageIcon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Cover Photo</h2>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Upload an image that represents your healthcare service
-                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Make your profile stand out</p>
               </div>
             </div>
 
-            <div className="space-y-8">
-              {/* Cover Photo Upload Section */}
-              <div className="space-y-4">
-                <div
-                  className={`relative rounded-lg border-2 border-dashed p-6 transition-colors ${
-                    selectedFile
-                      ? "border-blue-300 bg-blue-50"
-                      : "border-gray-300 bg-gray-50 hover:border-gray-400"
-                  }`}
-                >
-                  {selectedFile ? (
-                    <div className="space-y-4">
-                      {/* File Preview */}
-                      {previewUrl ? (
-                        <div className="relative">
-                          <Image
-                            src={previewUrl}
-                            alt="Cover photo preview"
-                            className="mx-auto max-h-64 rounded object-contain"
-                            height={50}
-                            width={50}
-                          />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="icon"
-                            className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                            onClick={clearSelectedFile}
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="text-center">
-                          <ImageIcon className="mx-auto h-12 w-12 text-blue-600" />
-                          <p className="mt-2 font-medium text-blue-700">
-                            {selectedFile.name}
-                          </p>
-                          <p className="text-sm text-blue-600">
-                            {formatFileSize(selectedFile.size)}
-                          </p>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="mt-2"
-                            onClick={clearSelectedFile}
-                          >
-                            <X className="mr-1 h-3 w-3" />
-                            Remove
-                          </Button>
-                        </div>
-                      )}
+            {/* Cover Photo Upload Section */}
+            <div
+              className={cn(
+                "relative rounded-xl border-2 border-dashed p-8 transition-all cursor-pointer",
+                selectedFile
+                  ? "border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/20"
+                  : "border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/50 hover:border-indigo-300 dark:hover:border-indigo-700 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10"
+              )}
+              onClick={() => {
+                if (!selectedFile) {
+                  const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+                  fileInput?.click();
+                }
+              }}
+            >
+              {selectedFile ? (
+                <div className="space-y-4">
+                  {previewUrl ? (
+                    <div className="relative max-w-md mx-auto">
+                      <div className="relative aspect-video rounded-lg overflow-hidden bg-white shadow-lg">
+                        <Image
+                          src={previewUrl}
+                          alt="Cover photo preview"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute -top-2 -right-2 h-8 w-8 rounded-full shadow-lg"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          clearSelectedFile();
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
                     </div>
                   ) : (
                     <div className="text-center">
-                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                      <p className="mt-2 text-sm font-medium text-gray-700">
-                        Click to upload or drag and drop
+                      <div className="h-16 w-16 rounded-2xl bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center mx-auto mb-3">
+                        <ImageIcon className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+                      </div>
+                      <p className="font-medium text-slate-900 dark:text-white">
+                        {selectedFile.name}
                       </p>
-                      <p className="text-xs text-gray-500">
-                        JPG, JPEG, PNG, GIF, SVG, WEBP (MAX. 2MB)
+                      <p className="text-sm text-slate-500">
+                        {formatFileSize(selectedFile.size)}
                       </p>
                       <Button
                         type="button"
                         variant="outline"
+                        size="sm"
                         className="mt-3"
-                        onClick={() => {
-                          const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-                          fileInput?.click();
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          clearSelectedFile();
                         }}
                       >
-                        Choose File
+                        <X className="mr-1 h-3 w-3" />
+                        Remove
                       </Button>
                     </div>
                   )}
-
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept=".jpg,.jpeg,.png,.gif,.svg,.webp"
-                    onChange={handleFileSelect}
-                  />
                 </div>
-                <p className="text-xs text-gray-500">
-                  Accepted formats: JPG, JPEG, PNG, GIF, SVG, WEBP up to 2MB
-                </p>
-              </div>
-
-              {/* Validation Errors */}
-              {errors.coverPhoto && (
-                <Alert className="border-red-200 bg-red-50">
-                  <AlertCircle className="h-4 w-4 text-red-600" />
-                  <AlertDescription className="text-red-700">
-                    {errors.coverPhoto.message as string}
-                  </AlertDescription>
-                </Alert>
+              ) : (
+                <div className="text-center">
+                  <div className="h-16 w-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
+                    <Upload className="h-8 w-8 text-slate-400" />
+                  </div>
+                  <p className="font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Click to upload your cover photo
+                  </p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    JPG, PNG, WEBP up to 2MB
+                  </p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">
+                    Recommended: 1200 x 630 pixels
+                  </p>
+                </div>
               )}
 
-              {/* Information Alert */}
-              <Alert className="border-blue-200 bg-blue-50">
-                <AlertCircle className="h-4 w-4 text-blue-600" />
-                <AlertDescription className="text-blue-800">
-                  <strong>Tip:</strong> A high-quality cover photo helps attract
-                  more clients. Choose an image that best represents your
-                  healthcare services.
-                </AlertDescription>
-              </Alert>
+              <input
+                type="file"
+                className="hidden"
+                accept=".jpg,.jpeg,.png,.gif,.svg,.webp"
+                onChange={handleFileSelect}
+              />
+            </div>
+
+            {/* Validation Errors */}
+            {errors.coverPhoto && (
+              <div className="mt-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 p-3 flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0" />
+                <p className="text-xs text-red-700 dark:text-red-300">{errors.coverPhoto.message as string}</p>
+              </div>
+            )}
+
+            {/* Pro Tip */}
+            <div className="mt-6 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 p-4 border border-indigo-100 dark:border-indigo-800/30">
+              <div className="flex gap-3">
+                <Sparkles className="h-5 w-5 text-indigo-500 shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-indigo-900 dark:text-indigo-100">Pro Tip</p>
+                  <p className="text-xs text-indigo-700 dark:text-indigo-300">
+                    Profiles with high-quality cover photos receive 3x more engagement. Use a professional image of your clinic, team, or services.
+                  </p>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Error Message */}
         {createProviderMutation.isError && (
-          <Alert className="border-red-200 bg-red-50">
-            <AlertCircle className="h-4 w-4 text-red-600" />
-            <AlertDescription className="text-red-700">
-              {createProviderMutation.error instanceof Error
-                ? createProviderMutation.error.message
-                : "Failed to create provider profile. Please try again."}
-            </AlertDescription>
-          </Alert>
+          <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 p-4 flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-red-800 dark:text-red-200">Submission Failed</p>
+              <p className="text-xs text-red-700 dark:text-red-300 mt-1">
+                {createProviderMutation.error instanceof Error
+                  ? createProviderMutation.error.message
+                  : "Failed to create provider profile. Please try again."}
+              </p>
+            </div>
+          </div>
         )}
 
-        {/* Navigation Buttons */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
-          <Link
-            href="/provider/onboarding/step-4"
-            className="flex items-center justify-center"
-          >
+        {/* Navigation */}
+        <div className="flex justify-between items-center pt-4">
+          <Link href="/provider/onboarding/step-4">
             <Button
               type="button"
               variant="outline"
-              className="w-full sm:w-auto border-slate-300 dark:border-white/10 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5"
-              onClick={() => router.back()}
+              size="lg"
+              className="border-slate-300 dark:border-white/10"
               disabled={createProviderMutation.isPending}
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
@@ -365,18 +374,19 @@ export default function OnboardingSummaryForm() {
           </Link>
           <Button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-cyan-600 dark:hover:bg-cyan-700 sm:w-auto"
+            size="lg"
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-200"
             disabled={createProviderMutation.isPending}
           >
             {createProviderMutation.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Submitting...
+                Creating Profile...
               </>
             ) : (
               <>
+                <CheckCircle2 className="mr-2 h-4 w-4" />
                 Complete Profile
-                <ChevronRight className="ml-2 h-4 w-4" />
               </>
             )}
           </Button>

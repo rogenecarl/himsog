@@ -18,6 +18,7 @@ import {
     Trash2,
     Package as PackageIcon,
     Layers,
+    Info,
 } from 'lucide-react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -35,6 +36,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { OnboardingStepper } from "./onboarding-stepper";
+import { cn } from "@/lib/utils";
 
 // --- CONSTANTS ---
 const DEFAULT_OPERATING_HOURS = [
@@ -321,41 +324,47 @@ export default function OnboardingStep2ServicesForm() {
     }, [healthcareName, categoryId, description, email, phoneNumber, router]);
 
     return (
-        <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-6">
+            {/* Progress Stepper */}
+            <OnboardingStepper currentStep={2} />
+
+            {/* Header */}
             <div className="mb-8 text-center">
-                <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30 mx-auto">
-                    <Clock className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+                <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg shadow-purple-500/25">
+                    <Clock className="h-7 w-7 text-white" />
                 </div>
-                <h1 className="mb-2 text-2xl font-bold text-slate-900 dark:text-white">Services & Schedules</h1>
-                <p className="text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
-                    List your healthcare services and set your provider operating hours
+                <h1 className="mb-2 text-2xl font-bold sm:text-3xl text-slate-900 dark:text-white">Services & Schedules</h1>
+                <p className="text-slate-600 dark:text-slate-400 max-w-xl mx-auto text-sm sm:text-base">
+                    Define your healthcare services and set your availability
                 </p>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-                <div className="grid gap-6 md:grid-cols-2">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <div className="grid gap-6 lg:grid-cols-2">
                     {/* Services Card */}
-                    <Card className="border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800">
-                        <CardContent className="pt-6">
-                            <div className="mb-4 flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <Stethoscope className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Healthcare Services</h2>
+                    <Card className="border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800/50 shadow-sm hover:shadow-md transition-shadow duration-200">
+                        <CardContent className="p-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-100 dark:bg-purple-900/30">
+                                        <Stethoscope className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Healthcare Services</h2>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400">Add services with pricing</p>
+                                    </div>
                                 </div>
                                 {!showServiceForm && (
                                     <Button
                                         type="button"
                                         size="sm"
-                                        className="bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600"
+                                        className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-md"
                                         onClick={handleAddService}
                                     >
-                                        <Plus className="mr-1 h-4 w-4" /> Add Service
+                                        <Plus className="mr-1 h-4 w-4" /> Add
                                     </Button>
                                 )}
                             </div>
-                            <p className="mb-6 text-sm text-slate-600 dark:text-slate-400">
-                                Add healthcare services or package bundles with pricing and insurance options
-                            </p>
 
                             <Dialog open={showServiceForm} onOpenChange={setShowServiceForm}>
                                 <DialogContent className="max-w-4xl max-h-[90vh] p-0 gap-0">
@@ -379,96 +388,106 @@ export default function OnboardingStep2ServicesForm() {
                             </Dialog>
                             
                             {services.length === 0 ? (
-                                        <div className="rounded-lg border border-dashed border-slate-300 dark:border-white/10 p-8 text-center">
+                                        <div className="rounded-xl border-2 border-dashed border-slate-200 dark:border-white/10 p-8 text-center bg-slate-50/50 dark:bg-slate-900/30">
                                             <div className="mb-4 flex justify-center">
-                                                <Stethoscope className="h-12 w-12 text-slate-300 dark:text-slate-600" />
+                                                <div className="h-16 w-16 rounded-2xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                                                    <Stethoscope className="h-8 w-8 text-purple-400" />
+                                                </div>
                                             </div>
-                                            <p className="mb-2 text-slate-500 dark:text-slate-400">No services added yet</p>
-                                            <p className="text-sm text-slate-400 dark:text-slate-500">
-                                                Click the button above to add your first service or package
+                                            <p className="mb-1 font-medium text-slate-700 dark:text-slate-300">No services added yet</p>
+                                            <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
+                                                Add your first service or package to show patients what you offer
                                             </p>
                                         </div>
                                     ) : (
-                                        <div className="space-y-4">
+                                        <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
                                             {services.map((service, index) => (
-                                                <div key={index} className="rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-4">
-                                                    <div className="flex items-start justify-between gap-4">
-                                                        <div className="flex-1">
+                                                <div
+                                                    key={index}
+                                                    className="group rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/50 p-4 hover:border-purple-200 dark:hover:border-purple-800/50 transition-colors"
+                                                >
+                                                    <div className="flex items-start justify-between gap-3">
+                                                        <div className="flex-1 min-w-0">
                                                             <div className="flex items-center gap-2 mb-1">
-                                                                {service.type === ServiceType.SINGLE ? (
-                                                                    <Layers className="h-4 w-4 text-indigo-600" />
-                                                                ) : (
-                                                                    <PackageIcon className="h-4 w-4 text-purple-600" />
-                                                                )}
-                                                                <h3 className="font-medium text-slate-900 dark:text-white">{service.name}</h3>
-                                                                <span className={`text-xs px-2 py-0.5 rounded-full ${
-                                                                    service.type === ServiceType.SINGLE 
-                                                                        ? 'bg-indigo-100 text-indigo-700' 
-                                                                        : 'bg-purple-100 text-purple-700'
-                                                                }`}>
-                                                                    {service.type === ServiceType.SINGLE ? 'Service' : 'Package'}
-                                                                </span>
+                                                                <div className={cn(
+                                                                    "h-6 w-6 rounded-md flex items-center justify-center",
+                                                                    service.type === ServiceType.SINGLE
+                                                                        ? "bg-indigo-100 dark:bg-indigo-900/30"
+                                                                        : "bg-purple-100 dark:bg-purple-900/30"
+                                                                )}>
+                                                                    {service.type === ServiceType.SINGLE ? (
+                                                                        <Layers className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
+                                                                    ) : (
+                                                                        <PackageIcon className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+                                                                    )}
+                                                                </div>
+                                                                <h3 className="font-medium text-slate-900 dark:text-white truncate">{service.name}</h3>
                                                             </div>
                                                             {service.description && (
-                                                                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{service.description}</p>
+                                                                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 ml-8">{service.description}</p>
                                                             )}
-                                                            
+
                                                             {/* Package included services */}
                                                             {service.type === ServiceType.PACKAGE && service.includedServices.length > 0 && (
-                                                                <div className="mt-2 flex flex-wrap gap-1">
-                                                                    {service.includedServices.map((s, i) => (
-                                                                        <span key={i} className="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded">
+                                                                <div className="mt-2 ml-8 flex flex-wrap gap-1">
+                                                                    {service.includedServices.slice(0, 2).map((s, i) => (
+                                                                        <span key={i} className="text-xs bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-md">
                                                                             {s}
                                                                         </span>
                                                                     ))}
+                                                                    {service.includedServices.length > 2 && (
+                                                                        <span className="text-xs text-slate-500">
+                                                                            +{service.includedServices.length - 2} more
+                                                                        </span>
+                                                                    )}
                                                                 </div>
                                                             )}
 
                                                             {/* Insurance badges */}
                                                             {service.acceptedInsurances.length > 0 && (
-                                                                <div className="mt-2 flex flex-wrap gap-1">
-                                                                    {service.acceptedInsurances.slice(0, 3).map((insId, i) => {
+                                                                <div className="mt-2 ml-8 flex flex-wrap gap-1">
+                                                                    {service.acceptedInsurances.slice(0, 2).map((insId, i) => {
                                                                         const provider = insuranceProviders.find(p => p.id === insId);
                                                                         return provider ? (
-                                                                            <span key={i} className="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded">
+                                                                            <span key={i} className="text-xs bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-md">
                                                                                 {provider.name}
                                                                             </span>
                                                                         ) : null;
                                                                     })}
-                                                                    {service.acceptedInsurances.length > 3 && (
+                                                                    {service.acceptedInsurances.length > 2 && (
                                                                         <span className="text-xs text-slate-500">
-                                                                            +{service.acceptedInsurances.length - 3} more
+                                                                            +{service.acceptedInsurances.length - 2} more
                                                                         </span>
                                                                     )}
                                                                 </div>
                                                             )}
                                                         </div>
-                                                        <div className="text-right">
-                                                            <p className="font-semibold text-slate-900 dark:text-white">
+                                                        <div className="text-right shrink-0">
+                                                            <p className="font-semibold text-slate-900 dark:text-white text-sm">
                                                                 {service.pricingModel === PricingModel.FIXED ? (
-                                                                    `₱${service.fixedPrice}`
+                                                                    `₱${service.fixedPrice.toLocaleString()}`
                                                                 ) : (
-                                                                    `₱${service.priceMin} - ₱${service.priceMax}`
+                                                                    `₱${service.priceMin.toLocaleString()} - ₱${service.priceMax.toLocaleString()}`
                                                                 )}
                                                             </p>
-                                                            <div className="mt-2 flex gap-2 justify-end">
+                                                            <div className="mt-2 flex gap-1.5 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
                                                                 <Button
                                                                     type="button"
                                                                     size="sm"
-                                                                    variant="outline"
-                                                                    className="h-7 px-2 text-xs"
+                                                                    variant="ghost"
+                                                                    className="h-7 w-7 p-0"
                                                                     onClick={() => handleEditService(index)}
                                                                 >
-                                                                    <Edit className="h-3 w-3" />
+                                                                    <Edit className="h-3.5 w-3.5 text-slate-500" />
                                                                 </Button>
                                                                 <Button
                                                                     type="button"
                                                                     size="sm"
-                                                                    variant="destructive"
-                                                                    className="h-7 px-2 text-xs"
+                                                                    variant="ghost"
+                                                                    className="h-7 w-7 p-0 hover:bg-red-100 hover:text-red-600"
                                                                     onClick={() => handleDeleteService(index)}
                                                                 >
-                                                                    <Trash2 className="h-3 w-3" />
+                                                                    <Trash2 className="h-3.5 w-3.5" />
                                                                 </Button>
                                                             </div>
                                                         </div>
@@ -478,100 +497,119 @@ export default function OnboardingStep2ServicesForm() {
                                         </div>
                                     )}
                                     {services.length === 0 && (
-                                        <Alert variant="destructive" className="mt-4 flex items-center gap-2">
-                                            <AlertCircle className="h-4 w-4" />
-                                            <AlertDescription>You must add at least one service to continue</AlertDescription>
-                                        </Alert>
+                                        <div className="mt-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/30 p-3 flex items-center gap-2">
+                                            <Info className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                                            <p className="text-xs text-amber-700 dark:text-amber-300">Add at least one service to continue</p>
+                                        </div>
                                     )}
                         </CardContent>
                     </Card>
 
                     {/* Operating Hours Card */}
-                    <Card className="border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800">
-                        <CardContent className="pt-6">
-                            <div className="mb-4 flex items-center gap-2">
-                                <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Operating Hours</h2>
+                    <Card className="border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800/50 shadow-sm hover:shadow-md transition-shadow duration-200">
+                        <CardContent className="p-6">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
+                                    <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                                </div>
+                                <div>
+                                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Operating Hours</h2>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">Set your weekly schedule</p>
+                                </div>
                             </div>
-                            <p className="mb-6 text-sm text-slate-600 dark:text-slate-400">
-                                Set your provider operating hours for each day of the week
-                            </p>
-                            <Alert className="mb-4 border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200 flex items-center gap-2">
-                                <AlertCircle className="h-4 w-4" />
-                                <AlertDescription>
-                                    At least one day must be open with operating hours
-                                </AlertDescription>
-                            </Alert>
-                            <div className="space-y-4">
+
+                            <div className="space-y-3">
                                 {operatingHours.map((day, i) => (
                                     <div
                                         key={day.dayOfWeek}
-                                        className="flex flex-col sm:flex-row items-center justify-between gap-2"
+                                        className={cn(
+                                            "flex items-center justify-between gap-3 p-3 rounded-lg border transition-colors",
+                                            day.isClosed
+                                                ? "bg-slate-50 dark:bg-slate-900/30 border-slate-200 dark:border-white/5"
+                                                : "bg-white dark:bg-slate-800 border-slate-200 dark:border-white/10"
+                                        )}
                                     >
-                                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                                        <div className="flex items-center gap-3 min-w-[120px]">
                                             <Switch
                                                 checked={!day.isClosed}
                                                 onCheckedChange={(checked) =>
                                                     handleOperatingHoursChange(i, "isClosed", !checked)
                                                 }
                                             />
-                                            <span className="font-medium">{getDayName(day.dayOfWeek)}</span>
+                                            <span className={cn(
+                                                "font-medium text-sm",
+                                                day.isClosed ? "text-slate-400 dark:text-slate-500" : "text-slate-900 dark:text-white"
+                                            )}>
+                                                {getDayName(day.dayOfWeek)}
+                                            </span>
                                         </div>
                                         {!day.isClosed ? (
-                                            <div className="flex items-center gap-2 w-full sm:w-auto">
-                                                <div className="relative">
-                                                    <Input
-                                                        type="time"
-                                                        className={`w-32 ${!day.isClosed && day.startTime && day.endTime && day.endTime <= day.startTime ? 'border-red-500' : ''}`}
-                                                        value={day.startTime || ""}
-                                                        onChange={(e) =>
-                                                            handleOperatingHoursChange(i, "startTime", formatToBackend(e.target.value))
-                                                        }
-                                                        required
-                                                    />
-                                                </div>
-                                                <span className="text-gray-500">to</span>
-                                                <div className="relative">
-                                                    <Input
-                                                        type="time"
-                                                        className={`w-32 ${!day.isClosed && day.startTime && day.endTime && day.endTime <= day.startTime ? 'border-red-500' : ''}`}
-                                                        value={day.endTime || ""}
-                                                        onChange={(e) =>
-                                                            handleOperatingHoursChange(i, "endTime", formatToBackend(e.target.value))
-                                                        }
-                                                        required
-                                                    />
-                                                    {!day.isClosed && day.startTime && day.endTime && day.endTime <= day.startTime && (
-                                                        <div className="absolute -bottom-5 left-0 w-64 text-xs text-red-500">
-                                                            End time must be after {formatTo12Hour(day.startTime)}
-                                                        </div>
+                                            <div className="flex items-center gap-2">
+                                                <Input
+                                                    type="time"
+                                                    className={cn(
+                                                        "w-[110px] h-9 text-sm bg-white dark:bg-slate-900",
+                                                        !day.isClosed && day.startTime && day.endTime && day.endTime <= day.startTime && "border-red-500"
                                                     )}
-                                                </div>
-                                                <span className="rounded bg-green-100 px-2 py-1 text-xs text-green-700">
+                                                    value={day.startTime || ""}
+                                                    onChange={(e) =>
+                                                        handleOperatingHoursChange(i, "startTime", formatToBackend(e.target.value))
+                                                    }
+                                                    required
+                                                />
+                                                <span className="text-slate-400 text-xs">to</span>
+                                                <Input
+                                                    type="time"
+                                                    className={cn(
+                                                        "w-[110px] h-9 text-sm bg-white dark:bg-slate-900",
+                                                        !day.isClosed && day.startTime && day.endTime && day.endTime <= day.startTime && "border-red-500"
+                                                    )}
+                                                    value={day.endTime || ""}
+                                                    onChange={(e) =>
+                                                        handleOperatingHoursChange(i, "endTime", formatToBackend(e.target.value))
+                                                    }
+                                                    required
+                                                />
+                                                <span className="hidden sm:inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-400">
                                                     Open
                                                 </span>
                                             </div>
                                         ) : (
-                                            <span className="rounded bg-gray-100 px-2 py-1 text-xs text-gray-700 w-full sm:w-auto text-center sm:text-left">
+                                            <span className="text-xs text-slate-400 dark:text-slate-500 italic">
                                                 Closed
                                             </span>
                                         )}
                                     </div>
                                 ))}
                             </div>
-                            {errors.operatingHours && (
-                                <p className="mt-2 text-red-600 text-sm">{errors.operatingHours.message}</p>
+
+                            {/* Error for time validation */}
+                            {hasOperatingHoursError && (
+                                <div className="mt-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 p-3 flex items-center gap-2">
+                                    <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0" />
+                                    <p className="text-xs text-red-700 dark:text-red-300">End time must be after start time</p>
+                                </div>
+                            )}
+
+                            {/* Warning if no days open */}
+                            {!isAnyDayOpen && (
+                                <div className="mt-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/30 p-3 flex items-center gap-2">
+                                    <Info className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                                    <p className="text-xs text-amber-700 dark:text-amber-300">At least one day must be open</p>
+                                </div>
                             )}
                         </CardContent>
                     </Card>
                 </div>
 
-                <div className="mt-8 flex flex-col sm:flex-row justify-between gap-4">
-                    <Link href="/provider/onboarding/step-1" className="flex items-center justify-center">
+                {/* Navigation */}
+                <div className="flex justify-between items-center pt-4">
+                    <Link href="/provider/onboarding/step-1">
                         <Button
                             type="button"
                             variant="outline"
-                            className="flex items-center justify-center border-slate-300 dark:border-white/10 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5"
+                            size="lg"
+                            className="border-slate-300 dark:border-white/10"
                         >
                             <ChevronLeft className="mr-2 h-4 w-4" />
                             Back
@@ -579,22 +617,18 @@ export default function OnboardingStep2ServicesForm() {
                     </Link>
                     <Button
                         type="submit"
-                        className="bg-blue-600 hover:bg-blue-700 dark:bg-cyan-600 dark:hover:bg-cyan-700 flex items-center justify-center"
+                        size="lg"
+                        className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-200"
                         disabled={services.length === 0 || !isAnyDayOpen || !isValid || hasOperatingHoursError || isNavigating}
                     >
                         {isNavigating ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Loading...
+                                Saving...
                             </>
-                        ) : hasOperatingHoursError ? (
-                            <div className="flex flex-col items-center">
-                                <span>Fix Operating Hours Errors</span>
-                                <span className="text-xs">Check end times are after start times</span>
-                            </div>
                         ) : (
                             <>
-                                Next: Documents
+                                Continue to Documents
                                 <ChevronRight className="ml-2 h-4 w-4" />
                             </>
                         )}

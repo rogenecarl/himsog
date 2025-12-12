@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -15,12 +16,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Building2, ChevronRight, Loader2, Mail, MapPin, Phone } from "lucide-react";
+import { Building2, ChevronRight, Loader2, Mail, Phone, Sparkles } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { useOnboardingCreateProviderProfileStore } from "@/store/create-provider-profile-store";
 import { useEffect, useState } from "react";
 import { useCategories } from "@/hooks/use-category";
+import { OnboardingStepper } from "./onboarding-stepper";
+import { cn } from "@/lib/utils";
 
 const onboardingInfoFormSchema = CreateProviderSchema.pick(
   {
@@ -56,12 +59,16 @@ export default function OnboardingStep1InfoForm() {
     handleSubmit,
     setValue,
     reset,
+    watch,
     formState: { errors },
   } = form;
 
+  // Watch the categoryId for reactive updates
+  const watchedCategoryId = watch("categoryId");
+
   // Load data from store when component mounts and categories are loaded
   useEffect(() => {
-    if (storedData.categoryId && categories.length > 0) {
+    if (categories.length > 0) {
       reset({
         healthcareName: storedData.healthcareName || "",
         categoryId: storedData.categoryId || "",
@@ -76,12 +83,17 @@ export default function OnboardingStep1InfoForm() {
     storedData.description,
     storedData.email,
     storedData.phoneNumber,
-    categories,
+    categories.length,
     reset,
   ]);
 
-  const categoryIdValue = form.getValues("categoryId");
-  const selectedCategoryId = categoryIdValue?.toString() || "0";
+  // Get the selected category ID reactively
+  const selectedCategoryId = watchedCategoryId || "";
+
+  // Find the selected category for display
+  const selectedCategory = categories.find(
+    (cat) => cat.id.toString() === selectedCategoryId
+  );
   const onSubmit = (data: OnboardingInfoFormType) => {
     setIsNavigating(true);
     setData(data);
@@ -90,115 +102,148 @@ export default function OnboardingStep1InfoForm() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-6">
+      {/* Progress Stepper */}
+      <OnboardingStepper currentStep={1} />
+
+      {/* Header */}
       <div className="mb-8 text-center">
-        <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 mx-auto">
-          <Building2 className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+        <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg shadow-blue-500/25">
+          <Building2 className="h-7 w-7 text-white" />
         </div>
         <h1 className="mb-2 text-2xl font-bold sm:text-3xl text-slate-900 dark:text-white">
           Business Information
         </h1>
-        <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto">
-          Provide details about your healthcare business for registration
+        <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto text-sm sm:text-base">
+          Let&apos;s start with the basics about your healthcare practice
         </p>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
           {/* Provider Details Card */}
-          <Card className="border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Provider Details</h2>
+          <Card className="border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800/50 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
+                  <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Provider Details</h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Basic information about your practice</p>
+                </div>
               </div>
-              <p className="mb-6 text-sm text-slate-600 dark:text-slate-400">
-                Provide information about your healthcare provider for your
-                profile
-              </p>
-              <div className="space-y-4">
+
+              <div className="space-y-5">
                 {/* Provider Name */}
                 <div className="space-y-2">
-                  <Label htmlFor="healthcareName" className="text-slate-700 dark:text-slate-300">
-                    Provider Name <span className="text-red-500 dark:text-red-400">*</span>
+                  <Label htmlFor="healthcareName" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Provider Name <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="healthcareName"
                     {...register("healthcareName")}
-                    placeholder="Enter your provider name"
-                    className="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white"
+                    placeholder="e.g., City Medical Center"
+                    className={cn(
+                      "h-11 bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white transition-colors",
+                      errors.healthcareName && "border-red-500 focus-visible:ring-red-500"
+                    )}
                   />
                   {errors.healthcareName && (
-                    <p className="text-red-600 dark:text-red-400 text-sm mt-1">
+                    <p className="text-red-500 text-xs flex items-center gap-1">
+                      <span className="inline-block w-1 h-1 rounded-full bg-red-500" />
                       {errors.healthcareName.message}
                     </p>
                   )}
                 </div>
+
                 {/* Category Type */}
                 <div className="space-y-2">
-                  <Label htmlFor="categoryId" className="text-slate-700 dark:text-slate-300">
-                    Category Type <span className="text-red-500 dark:text-red-400">*</span>
+                  <Label htmlFor="categoryId" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Healthcare Category <span className="text-red-500">*</span>
                   </Label>
                   <Select
                     value={selectedCategoryId}
-                    onValueChange={(value) => setValue("categoryId", value)}
+                    onValueChange={(value) => setValue("categoryId", value, { shouldValidate: true })}
                   >
                     <SelectTrigger
-                      className="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white"
-                      aria-label="Select provider type"
+                      className={cn(
+                        "h-11 bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white",
+                        errors.categoryId && "border-red-500 focus:ring-red-500"
+                      )}
+                      aria-label="Select healthcare category"
                     >
-                      <SelectValue placeholder="Select provider type" />
+                      {selectedCategory ? (
+                        <div className="flex items-center gap-2">
+                          {selectedCategory.icon && (
+                            <span
+                              className="flex h-5 w-5 items-center justify-center rounded-md text-sm"
+                              style={{ backgroundColor: `${selectedCategory.color}20`, color: selectedCategory.color }}
+                            >
+                              {selectedCategory.icon}
+                            </span>
+                          )}
+                          <span className="font-medium">{selectedCategory.name}</span>
+                        </div>
+                      ) : (
+                        <SelectValue placeholder="Select your practice type" />
+                      )}
                     </SelectTrigger>
                     <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10">
-                      <SelectItem value="0" disabled>
-                        Select provider type
-                      </SelectItem>
                       {categories.length > 0 ? (
                         categories.map((category) => (
                           <SelectItem
                             key={category.id}
                             value={category.id.toString()}
+                            className="cursor-pointer"
                           >
                             <div className="flex items-center gap-2">
                               {category.icon && (
                                 <span
-                                  className="flex h-4 w-4 items-center justify-center"
-                                  style={{ color: category.color }}
+                                  className="flex h-5 w-5 items-center justify-center rounded-md text-sm"
+                                  style={{ backgroundColor: `${category.color}20`, color: category.color }}
                                 >
                                   {category.icon}
                                 </span>
                               )}
-                              {category.name}
+                              <span>{category.name}</span>
                             </div>
                           </SelectItem>
                         ))
                       ) : (
-                        <div className="space-y-2 p-2">
-                          <Skeleton className="h-5 w-full rounded-sm bg-slate-200 dark:bg-white/10" />
-                          <Skeleton className="h-5 w-full rounded-sm bg-slate-200 dark:bg-white/10" />
-                          <Skeleton className="h-5 w-full rounded-sm bg-slate-200 dark:bg-white/10" />
-                          <Skeleton className="h-5 w-full rounded-sm bg-slate-200 dark:bg-white/10" />
-                          <Skeleton className="h-5 w-full rounded-sm bg-slate-200 dark:bg-white/10" />
+                        <div className="space-y-2 p-3">
+                          <Skeleton className="h-8 w-full rounded-md" />
+                          <Skeleton className="h-8 w-full rounded-md" />
+                          <Skeleton className="h-8 w-full rounded-md" />
                         </div>
                       )}
                     </SelectContent>
                   </Select>
                   {errors.categoryId && (
-                    <p className="text-red-600 dark:text-red-400 text-sm mt-1">
+                    <p className="text-red-500 text-xs flex items-center gap-1">
+                      <span className="inline-block w-1 h-1 rounded-full bg-red-500" />
                       {errors.categoryId.message}
                     </p>
                   )}
                 </div>
+
                 {/* Description */}
                 <div className="space-y-2">
-                  <Label htmlFor="description" className="text-slate-700 dark:text-slate-300">Description</Label>
-                  <textarea
+                  <Label htmlFor="description" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Description <span className="text-red-500">*</span>
+                  </Label>
+                  <Textarea
                     id="description"
                     {...register("description")}
-                    className="flex h-24 w-full rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-y"
-                    placeholder="Describe your healthcare practice (services offered, specialties, etc.)"
+                    className={cn(
+                      "min-h-[100px] bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white resize-none",
+                      errors.description && "border-red-500 focus-visible:ring-red-500"
+                    )}
+                    placeholder="Tell patients about your practice, specialties, and what makes you unique..."
                   />
                   {errors.description && (
-                    <p className="text-red-600 dark:text-red-400 text-sm mt-1">
+                    <p className="text-red-500 text-xs flex items-center gap-1">
+                      <span className="inline-block w-1 h-1 rounded-full bg-red-500" />
                       {errors.description.message}
                     </p>
                   )}
@@ -206,81 +251,109 @@ export default function OnboardingStep1InfoForm() {
               </div>
             </CardContent>
           </Card>
-          {/* Location Information Card */}
-          <Card className="border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-green-600 dark:text-green-400" />
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Location Information</h2>
+
+          {/* Contact Information Card */}
+          <Card className="border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800/50 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-100 dark:bg-green-900/30">
+                  <Phone className="h-5 w-5 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Contact Information</h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">How patients can reach you</p>
+                </div>
               </div>
-              <p className="mb-6 text-sm text-slate-600 dark:text-slate-400">
-                Your business location will be displayed to patients searching
-                for healthcare services
-              </p>
-              <div className="space-y-4">
+
+              <div className="space-y-5">
                 {/* Email */}
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-slate-700 dark:text-slate-300">
-                    Email <span className="text-red-500 dark:text-red-400">*</span>
+                  <Label htmlFor="email" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Email Address <span className="text-red-500">*</span>
                   </Label>
-                  <div className="flex w-full">
-                    <div className="flex items-center rounded-l-md border border-r-0 border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-slate-900 px-3">
+                  <div className="relative">
+                    <div className="absolute left-0 top-0 h-11 w-11 flex items-center justify-center rounded-l-md border border-r-0 border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800">
                       <Mail className="h-4 w-4 text-slate-500 dark:text-slate-400" />
                     </div>
                     <Input
                       id="email"
                       type="email"
                       {...register("email")}
-                      placeholder="provider@example.com"
-                      className="rounded-l-none w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white"
+                      placeholder="contact@yourpractice.com"
+                      className={cn(
+                        "h-11 pl-12 bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white",
+                        errors.email && "border-red-500 focus-visible:ring-red-500"
+                      )}
                     />
                   </div>
                   {errors.email && (
-                    <p className="text-red-600 dark:text-red-400 text-sm mt-1">
+                    <p className="text-red-500 text-xs flex items-center gap-1">
+                      <span className="inline-block w-1 h-1 rounded-full bg-red-500" />
                       {errors.email.message}
                     </p>
                   )}
                 </div>
+
                 {/* Phone Number */}
                 <div className="space-y-2">
-                  <Label htmlFor="phoneNumber" className="text-slate-700 dark:text-slate-300">
-                    Phone <span className="text-red-500 dark:text-red-400">*</span>
+                  <Label htmlFor="phoneNumber" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Phone Number <span className="text-red-500">*</span>
                   </Label>
-                  <div className="flex w-full">
-                    <div className="flex items-center rounded-l-md border border-r-0 border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-slate-900 px-3">
+                  <div className="relative">
+                    <div className="absolute left-0 top-0 h-11 w-11 flex items-center justify-center rounded-l-md border border-r-0 border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800">
                       <Phone className="h-4 w-4 text-slate-500 dark:text-slate-400" />
                     </div>
                     <Input
                       id="phoneNumber"
                       {...register("phoneNumber")}
                       placeholder="+63 912 345 6789"
-                      className="rounded-l-none w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white"
+                      className={cn(
+                        "h-11 pl-12 bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white",
+                        errors.phoneNumber && "border-red-500 focus-visible:ring-red-500"
+                      )}
                     />
                   </div>
                   {errors.phoneNumber && (
-                    <p className="text-red-600 dark:text-red-400 text-sm mt-1">
+                    <p className="text-red-500 text-xs flex items-center gap-1">
+                      <span className="inline-block w-1 h-1 rounded-full bg-red-500" />
                       {errors.phoneNumber.message}
                     </p>
                   )}
+                </div>
+
+                {/* Info box */}
+                <div className="mt-6 rounded-xl bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 p-4 border border-blue-100 dark:border-blue-800/30">
+                  <div className="flex gap-3">
+                    <Sparkles className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-blue-900 dark:text-blue-100">Pro Tip</p>
+                      <p className="text-xs text-blue-700 dark:text-blue-300">
+                        Use a professional email and ensure your phone number is active for appointment confirmations.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
-        <div className="mt-8 flex justify-end">
+
+        {/* Navigation */}
+        <div className="flex justify-end pt-4">
           <Button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 dark:bg-cyan-600 dark:hover:bg-cyan-700 flex items-center"
+            size="lg"
+            className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-200"
             disabled={isNavigating}
           >
             {isNavigating ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Loading...
+                Saving...
               </>
             ) : (
               <>
-                Next
+                Continue to Services
                 <ChevronRight className="ml-2 h-4 w-4" />
               </>
             )}

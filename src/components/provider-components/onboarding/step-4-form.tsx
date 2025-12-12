@@ -18,9 +18,12 @@ import {
   Loader2,
   MapPin,
   Navigation,
+  Target,
 } from "lucide-react";
 import { useOnboardingCreateProviderProfileStore } from "@/store/create-provider-profile-store";
 import Link from "next/link";
+import { OnboardingStepper } from "./onboarding-stepper";
+import { cn } from "@/lib/utils";
 
 // Set Mapbox access token
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!;
@@ -286,169 +289,147 @@ export default function OnboardingStep4LocationForm() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-6">
+      {/* Progress Stepper */}
+      <OnboardingStepper currentStep={4} />
+
       {/* Header Section */}
       <div className="mb-8 text-center">
-        <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-          <MapPin className="h-8 w-8 text-green-600 dark:text-green-400" />
+        <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg shadow-green-500/25">
+          <MapPin className="h-7 w-7 text-white" />
         </div>
         <h1 className="mb-2 text-2xl font-bold sm:text-3xl text-slate-900 dark:text-white">
           Business Location
         </h1>
-        <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-          Set your provider location on the map for customers to find you easily
+        <p className="text-slate-600 dark:text-slate-400 max-w-lg mx-auto text-sm sm:text-base">
+          Set your location on the map so patients can find you
         </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <Card className="overflow-hidden border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800">
-          <CardContent className="p-6 sm:p-8">
-            {/* Section Header */}
-            <div className="mb-6 flex items-center gap-3">
-              <div className="rounded-lg bg-green-100 dark:bg-green-900/30 p-2">
-                <MapPin className="h-5 w-5 text-green-600 dark:text-green-400" />
+        <Card className="overflow-hidden border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800/50 shadow-sm">
+          <CardContent className="p-6">
+            {/* Map Controls Header */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-100 dark:bg-green-900/30">
+                  <Target className="h-5 w-5 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Pin Your Location</h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Click map or use current location</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Map Location</h2>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Click on the map to set your location
-                </p>
-              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={getCurrentLocation}
+                disabled={isGettingLocation}
+                className="gap-2 border-green-200 text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-900/20"
+              >
+                {isGettingLocation ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Navigation className="h-4 w-4" />
+                )}
+                {isGettingLocation ? "Detecting..." : "Use My Location"}
+              </Button>
             </div>
 
-            <div className="space-y-8">
-              {/* Map Container */}
-              <div className="space-y-4">
-                {/* Current Location Button */}
-                <div className="flex justify-end">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={getCurrentLocation}
-                    disabled={isGettingLocation}
-                    className="flex items-center gap-2"
-                  >
-                    {isGettingLocation ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Navigation className="h-4 w-4" />
-                    )}
-                    {isGettingLocation
-                      ? "Getting Location..."
-                      : "Use Current Location"}
-                  </Button>
+            {/* Map Container */}
+            <div className="relative h-[350px] sm:h-[400px] w-full overflow-hidden rounded-xl border border-slate-200 dark:border-white/10">
+              <div ref={mapContainerRef} className="h-full w-full" />
+
+              {/* Map Overlay with Coordinates */}
+              <div className="absolute top-3 left-3 rounded-lg bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm px-3 py-2 text-xs font-mono shadow-lg border border-slate-200 dark:border-white/10">
+                <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                  <MapPin className="h-3 w-3 text-green-500" />
+                  <span>{watchedLat.toFixed(5)}, {watchedLng.toFixed(5)}</span>
                 </div>
-
-                {/* Map */}
-                <div className="relative h-80 w-full overflow-hidden rounded-lg border md:h-96">
-                  <div ref={mapContainerRef} className="h-full w-full" />
-
-                  {/* Map Overlay with Coordinates */}
-                  <div className="absolute top-4 left-4 rounded-lg bg-white/90 backdrop-blur-sm px-3 py-2 text-xs font-mono shadow-md">
-                    <div className="text-gray-600">
-                      <div>Lat: {watchedLat.toFixed(6)}</div>
-                      <div>Lng: {watchedLng.toFixed(6)}</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Selected Location Display Panel */}
-                {selectedLocation && (
-                  <div className="rounded-lg border bg-blue-50 p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <MapPin className="h-5 w-5 text-blue-600" />
-                      <h4 className="font-medium text-blue-900">
-                        Selected Location
-                      </h4>
-                    </div>
-                    <div className="space-y-2 text-sm">
-                      {selectedLocation.address && (
-                        <div className="flex justify-between">
-                          <span className="text-blue-700 font-medium">
-                            Address:
-                          </span>
-                          <span className="text-blue-800 text-right flex-1 ml-2">
-                            {selectedLocation.address}
-                          </span>
-                        </div>
-                      )}
-                      {selectedLocation.city && (
-                        <div className="flex justify-between">
-                          <span className="text-blue-700 font-medium">
-                            City:
-                          </span>
-                          <span className="text-blue-800 text-right flex-1 ml-2">
-                            {selectedLocation.city}
-                          </span>
-                        </div>
-                      )}
-                      {selectedLocation.province && (
-                        <div className="flex justify-between">
-                          <span className="text-blue-700 font-medium">
-                            Province:
-                          </span>
-                          <span className="text-blue-800 text-right flex-1 ml-2">
-                            {selectedLocation.province}
-                          </span>
-                        </div>
-                      )}
-                      <div className="flex justify-between">
-                        <span className="text-blue-700 font-medium">
-                          Latitude:
-                        </span>
-                        <span className="text-blue-800 font-mono">
-                          {selectedLocation.lat.toFixed(6)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-blue-700 font-medium">
-                          Longitude:
-                        </span>
-                        <span className="text-blue-800 font-mono">
-                          {selectedLocation.lng.toFixed(6)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Location Error */}
-                {locationError && (
-                  <Alert className="border-red-200 bg-red-50">
-                    <Info className="h-4 w-4 text-red-600" />
-                    <AlertDescription className="text-red-700">
-                      {locationError}
-                    </AlertDescription>
-                  </Alert>
-                )}
               </div>
 
-              {/* Info Alert */}
-              <Alert className="border-blue-200 bg-blue-50">
-                <Info className="h-4 w-4 text-blue-600" />
-                <AlertDescription className="text-blue-800">
-                  <strong>Tip:</strong> Click anywhere on the map to set your
-                  location, or use the &quot;Use Current Location&quot; button
-                  to automatically detect your position. You can drag the marker
-                  to fine-tune your location.
-                </AlertDescription>
-              </Alert>
+              {/* Click instruction overlay */}
+              {!selectedLocation && (
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-slate-900/80 backdrop-blur-sm px-4 py-2 text-xs text-white shadow-lg">
+                  Click on the map to set your location
+                </div>
+              )}
+            </div>
+
+            {/* Selected Location Display Panel */}
+            {selectedLocation && (
+              <div className="mt-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-4 border border-green-100 dark:border-green-800/30">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-8 w-8 rounded-lg bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
+                    <MapPin className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  </div>
+                  <h4 className="font-medium text-green-900 dark:text-green-100">
+                    Selected Location
+                  </h4>
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2 text-sm">
+                  {selectedLocation.address && (
+                    <div className="col-span-2 flex gap-2">
+                      <span className="text-green-700 dark:text-green-300 font-medium shrink-0">Address:</span>
+                      <span className="text-green-800 dark:text-green-200">{selectedLocation.address}</span>
+                    </div>
+                  )}
+                  {selectedLocation.city && (
+                    <div className="flex gap-2">
+                      <span className="text-green-700 dark:text-green-300 font-medium">City:</span>
+                      <span className="text-green-800 dark:text-green-200">{selectedLocation.city}</span>
+                    </div>
+                  )}
+                  {selectedLocation.province && (
+                    <div className="flex gap-2">
+                      <span className="text-green-700 dark:text-green-300 font-medium">Province:</span>
+                      <span className="text-green-800 dark:text-green-200">{selectedLocation.province}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Location Error */}
+            {locationError && (
+              <div className="mt-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 p-3 flex items-center gap-2">
+                <Info className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0" />
+                <p className="text-xs text-red-700 dark:text-red-300">{locationError}</p>
+              </div>
+            )}
+
+            {/* Validation Message */}
+            {!selectedLocation && (
+              <div className="mt-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/30 p-3 flex items-center gap-2">
+                <Info className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                <p className="text-xs text-amber-700 dark:text-amber-300">Please select a location on the map to continue</p>
+              </div>
+            )}
+
+            {/* Info Tip */}
+            <div className="mt-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 p-4 border border-slate-100 dark:border-white/5">
+              <div className="flex gap-3">
+                <Info className="h-5 w-5 text-slate-400 shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Location Tips</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Drag the marker to fine-tune your exact location. A precise location helps patients navigate to your practice easily.
+                  </p>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Navigation Buttons */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
-          <Link
-            href="/provider/onboarding/step-3"
-            className="flex items-center justify-center"
-          >
+        {/* Navigation */}
+        <div className="flex justify-between items-center pt-4">
+          <Link href="/provider/onboarding/step-3">
             <Button
               type="button"
               variant="outline"
-              className="w-full sm:w-auto border-slate-300 dark:border-white/10 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5"
-              onClick={() => router.back()}
+              size="lg"
+              className="border-slate-300 dark:border-white/10"
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
               Back
@@ -456,19 +437,18 @@ export default function OnboardingStep4LocationForm() {
           </Link>
           <Button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-cyan-600 dark:hover:bg-cyan-700 sm:w-auto"
-            disabled={
-              !selectedLocation || !!errors.latitude || !!errors.longitude || isNavigating
-            }
+            size="lg"
+            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-200"
+            disabled={!selectedLocation || !!errors.latitude || !!errors.longitude || isNavigating}
           >
             {isNavigating ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Loading...
+                Saving...
               </>
             ) : (
               <>
-                Next: Summary
+                Continue to Summary
                 <ChevronRight className="ml-2 h-4 w-4" />
               </>
             )}
