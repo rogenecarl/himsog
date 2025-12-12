@@ -222,6 +222,61 @@ export async function createProviderProfile(formData: FormData) {
 
     const validatedData = validation.data;
 
+    // Check uniqueness of healthcare name, email, and phone number
+    const existingProviderByName = await prisma.provider.findFirst({
+      where: {
+        healthcareName: {
+          equals: validatedData.healthcareName,
+          mode: "insensitive",
+        },
+      },
+      select: { id: true },
+    });
+
+    if (existingProviderByName) {
+      return {
+        success: false,
+        error: "A provider with this healthcare name already exists. Please choose a different name.",
+        field: "healthcareName",
+        redirectTo: "/provider/onboarding/step-1",
+      };
+    }
+
+    const existingProviderByEmail = await prisma.provider.findFirst({
+      where: {
+        email: {
+          equals: validatedData.email,
+          mode: "insensitive",
+        },
+      },
+      select: { id: true },
+    });
+
+    if (existingProviderByEmail) {
+      return {
+        success: false,
+        error: "A provider with this email address already exists. Please use a different email.",
+        field: "email",
+        redirectTo: "/provider/onboarding/step-1",
+      };
+    }
+
+    const existingProviderByPhone = await prisma.provider.findFirst({
+      where: {
+        phoneNumber: validatedData.phoneNumber,
+      },
+      select: { id: true },
+    });
+
+    if (existingProviderByPhone) {
+      return {
+        success: false,
+        error: "A provider with this phone number already exists. Please use a different phone number.",
+        field: "phoneNumber",
+        redirectTo: "/provider/onboarding/step-1",
+      };
+    }
+
     // Handle cover photo upload to Supabase Storage BEFORE transaction
     let coverPhotoPath: string | null = null;
     let coverPhotoFilePath: string | null = null;

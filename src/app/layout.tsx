@@ -6,8 +6,6 @@ import { Toaster } from "@/components/ui/sonner";
 import QueryProvider from "@/context/QueryProvider";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { CapacitorBackButton } from "@/components/capacitor-back-button";
-import { Analytics } from '@vercel/analytics/next';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const notoSansKR = Noto_Sans_KR({
   weight: ["300", "400", "500", "700"],
@@ -17,7 +15,7 @@ const notoSansKR = Noto_Sans_KR({
 });
 
 // 1. Setup your base URL (Change this to your actual domain when deployed)
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://himsog.com";
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://himsog.tech";
 
 export const viewport: Viewport = {
   themeColor: "#ffffff",
@@ -29,7 +27,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Himsog | Centralized Healthcare Geolocation System",
+    default: "Himsog",
     template: "%s | Himsog", // Result: "Veterinarians | Himsog"
   },
   description:
@@ -121,8 +119,6 @@ export default function RootLayout({
           >
             <Toaster richColors position="top-right" />
             <main className="min-h-screen flex flex-col">{children}
-              <SpeedInsights />
-              <Analytics />
             </main>
           </ThemeProvider>
         </QueryProvider>

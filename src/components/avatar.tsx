@@ -1,16 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { LogOut, Settings, User as UserIcon, ChevronDown, LayoutDashboard } from "lucide-react";
+import { LogOut, User as UserIcon, ChevronDown, LayoutDashboard } from "lucide-react";
 import { useUser } from "@/context/UserContext";
-import { useRouter } from "next/navigation";
 import { useSignOut } from "@/hooks/use-auth";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function AvatarDropdownmenu() {
   const user = useUser();
-  const router = useRouter();
   const { handleLogout, isLoggingOut } = useSignOut();
   const [isOpen, setIsOpen] = useState(false);
 

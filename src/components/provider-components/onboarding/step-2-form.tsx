@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -66,15 +65,6 @@ function getDayName(index: number) {
     return dayNames[index] || "";
 }
 
-function formatTo12Hour(time24: string | null | undefined): string {
-    if (!time24) return "";
-    const [hours, minutes] = time24.split(':');
-    const hoursNum = parseInt(hours, 10);
-    const ampm = hoursNum >= 12 ? 'PM' : 'AM';
-    const hours12 = hoursNum % 12 || 12;
-    return `${hours12}:${minutes} ${ampm}`;
-}
-
 function formatToBackend(timeStr: string): string {
     if (!timeStr) return "";
     const [hours, minutes] = timeStr.split(':');
@@ -92,12 +82,28 @@ export default function OnboardingStep2ServicesForm() {
     const email = useOnboardingCreateProviderProfileStore((state) => state.email);
     const phoneNumber = useOnboardingCreateProviderProfileStore((state) => state.phoneNumber);
 
-    // Services state - initialize directly from store
-    const [services, setServices] = useState<ServiceWithInsurance[]>(() => storedData.services || []);
+    // Services state - initialized from store if already hydrated
+    const [services, setServices] = useState<ServiceWithInsurance[]>(() => {
+        // Try to get initial value from store if already hydrated (e.g., client-side navigation)
+        if (typeof window !== 'undefined') {
+            try {
+                const stored = localStorage.getItem('onboarding-create-provider-profile');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (parsed.state?.services && parsed.state.services.length > 0) {
+                        return parsed.state.services;
+                    }
+                }
+            } catch {
+                // Ignore parse errors
+            }
+        }
+        return [];
+    });
     const [showServiceForm, setShowServiceForm] = useState(false);
     const [editingServiceIndex, setEditingServiceIndex] = useState<number | null>(null);
     const [insuranceProviders, setInsuranceProviders] = useState<InsuranceProvider[]>([]);
-    
+
     // Initial service form data
     const getInitialFormData = (): ServiceFormData => ({
         type: ServiceType.SINGLE,
@@ -113,13 +119,28 @@ export default function OnboardingStep2ServicesForm() {
 
     const [serviceFormData, setServiceFormData] = useState<ServiceFormData>(getInitialFormData());
 
-    // React Hook Form setup for operating hours - initialize directly from store
+    // React Hook Form setup for operating hours - try to load from localStorage initially
+    const getInitialOperatingHours = () => {
+        if (typeof window !== 'undefined') {
+            try {
+                const stored = localStorage.getItem('onboarding-create-provider-profile');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (parsed.state?.operatingHours && parsed.state.operatingHours.length > 0) {
+                        return parsed.state.operatingHours;
+                    }
+                }
+            } catch {
+                // Ignore parse errors
+            }
+        }
+        return DEFAULT_OPERATING_HOURS;
+    };
+
     const form = useForm<OnboardingServicesFormType>({
         resolver: zodResolver(onboardingServicesFormSchema),
         defaultValues: {
-            operatingHours: (storedData.operatingHours && storedData.operatingHours.length > 0) 
-                ? storedData.operatingHours 
-                : DEFAULT_OPERATING_HOURS,
+            operatingHours: getInitialOperatingHours(),
         },
         mode: "onChange",
     });
@@ -128,7 +149,7 @@ export default function OnboardingStep2ServicesForm() {
         handleSubmit,
         setValue,
         getValues,
-        formState: { errors, isValid },
+        formState: { isValid },
     } = form;
 
     // Fetch insurance providers
@@ -144,8 +165,6 @@ export default function OnboardingStep2ServicesForm() {
         };
         fetchInsuranceProviders();
     }, []);
-
-    // No need for hydration effect - state is initialized directly from store
 
     const watchedOperatingHours = getValues("operatingHours");
     const operatingHours = watchedOperatingHours && watchedOperatingHours.length > 0 

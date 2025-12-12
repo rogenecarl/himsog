@@ -1,9 +1,4 @@
 import { memo } from "react";
-import {
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from "@/components/ui/sidebar";
 import Link from "next/link";
 import Image from "next/image";
 

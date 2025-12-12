@@ -2,13 +2,11 @@
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useForm } from "react-hook-form";
-
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -23,7 +21,6 @@ import {
 import { useOnboardingCreateProviderProfileStore } from "@/store/create-provider-profile-store";
 import Link from "next/link";
 import { OnboardingStepper } from "./onboarding-stepper";
-import { cn } from "@/lib/utils";
 
 // Set Mapbox access token
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!;
@@ -39,6 +36,42 @@ const onboardingLocationFormSchema = z.object({
 
 type OnboardingLocationFormType = z.infer<typeof onboardingLocationFormSchema>;
 
+// Default coordinates (Philippines center)
+const DEFAULT_LAT = 6.74468;
+const DEFAULT_LNG = 125.365847;
+
+// Helper to get initial location from localStorage
+const getInitialLocationData = () => {
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('onboarding-create-provider-profile');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const state = parsed.state;
+        if (state?.latitude && state?.longitude &&
+            state.latitude !== DEFAULT_LAT && state.longitude !== DEFAULT_LNG) {
+          return {
+            address: state.address || "",
+            city: state.city || "",
+            province: state.province || "",
+            latitude: state.latitude,
+            longitude: state.longitude,
+          };
+        }
+      }
+    } catch {
+      // Ignore parse errors
+    }
+  }
+  return {
+    address: "",
+    city: "",
+    province: "",
+    latitude: DEFAULT_LAT,
+    longitude: DEFAULT_LNG,
+  };
+};
+
 export default function OnboardingStep4LocationForm() {
   const router = useRouter();
   const [isNavigating, setIsNavigating] = useState(false);
@@ -52,23 +85,34 @@ export default function OnboardingStep4LocationForm() {
   const markerRef = useRef<mapboxgl.Marker | null>(null);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [locationError, setLocationError] = useState<string>("");
+
+  // Get initial location data from localStorage
+  const initialLocationData = getInitialLocationData();
+  const hasStoredLocation = initialLocationData.latitude !== DEFAULT_LAT ||
+                            initialLocationData.longitude !== DEFAULT_LNG;
+
   const [selectedLocation, setSelectedLocation] = useState<{
     lat: number;
     lng: number;
     address?: string;
     city?: string;
     province?: string;
-  } | null>(null);
+  } | null>(() => {
+    if (hasStoredLocation) {
+      return {
+        lat: initialLocationData.latitude,
+        lng: initialLocationData.longitude,
+        address: initialLocationData.address,
+        city: initialLocationData.city,
+        province: initialLocationData.province,
+      };
+    }
+    return null;
+  });
 
   const form = useForm<OnboardingLocationFormType>({
     resolver: zodResolver(onboardingLocationFormSchema),
-    defaultValues: {
-      address: "",
-      city: "",
-      province: "",
-      longitude: 125.365847, // Default to Philippines center
-      latitude: 6.74468,
-    },
+    defaultValues: initialLocationData,
     mode: "onChange",
   });
 
@@ -82,54 +126,53 @@ export default function OnboardingStep4LocationForm() {
   const watchedLat = watch("latitude");
   const watchedLng = watch("longitude");
 
-  // Initialize map
-  useEffect(() => {
-    if (!mapContainerRef.current || mapRef.current) return;
+  // Ref to store the latest handleLocationSelect function
+  const handleLocationSelectRef = useRef<(lng: number, lat: number, shouldAnimate?: boolean) => void>();
 
-    mapRef.current = new mapboxgl.Map({
-      container: mapContainerRef.current,
-      style: "mapbox://styles/rogenecarl/cmcoe04d8008l01sq35v2hqdt",
-      center: [watchedLng, watchedLat],
-      zoom: 12,
-      attributionControl: false,
-      logoPosition: "bottom-right",
-    });
+  // Define reverseGeocode as a callback (needed before handleLocationSelect)
+  const reverseGeocode = useCallback(async (lng: number, lat: number) => {
+    try {
+      const response = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`
+      );
+      const data = await response.json();
 
-    mapRef.current.on("load", () => {
-      // Add initial marker
-      if (mapRef.current) {
-        const initialMarker = new mapboxgl.Marker({
-          color: "#3B82F6",
-          draggable: true,
-        })
-          .setLngLat([watchedLng, watchedLat])
-          .addTo(mapRef.current);
+      if (data.features && data.features.length > 0) {
+        const feature = data.features[0];
+        const context = feature.context || [];
 
-        // Handle marker drag
-        initialMarker.on("dragend", () => {
-          const newLngLat = initialMarker.getLngLat();
-          handleLocationSelect(newLngLat.lng, newLngLat.lat, false); // Don't animate on drag
-        });
+        // Extract address components
+        const fullAddress = feature.place_name || "";
+        const address = feature.place_name?.split(",")[0] || "";
+        const city =
+          context.find((c: { id: string; text: string }) => c.id.includes("place"))?.text || "";
+        const province =
+          context.find((c: { id: string; text: string }) => c.id.includes("region"))?.text || "";
 
-        markerRef.current = initialMarker;
+        // Update selectedLocation state for display
+        setSelectedLocation((prev) =>
+          prev
+            ? {
+                ...prev,
+                address: fullAddress,
+                city: city,
+                province: province,
+              }
+            : null
+        );
+
+        // Update form values for backend submission
+        setValue("address", address);
+        setValue("city", city);
+        setValue("province", province);
       }
-    });
+    } catch (error) {
+      console.error("Reverse geocoding error:", error);
+    }
+  }, [setValue]);
 
-    // Handle map clicks
-    mapRef.current.on("click", (e) => {
-      const { lng, lat } = e.lngLat;
-      handleLocationSelect(lng, lat, true); // Animate on click
-    });
-
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-    };
-  }, []); // Remove dependencies to prevent re-rendering
-
-  const handleLocationSelect = (
+  // Define handleLocationSelect as a callback
+  const handleLocationSelect = useCallback((
     lng: number,
     lat: number,
     shouldAnimate: boolean = true
@@ -174,7 +217,7 @@ export default function OnboardingStep4LocationForm() {
       // Handle marker drag
       newMarker.on("dragend", () => {
         const newLngLat = newMarker.getLngLat();
-        handleLocationSelect(newLngLat.lng, newLngLat.lat, false); // Don't animate on drag
+        handleLocationSelectRef.current?.(newLngLat.lng, newLngLat.lat, false); // Don't animate on drag
       });
 
       markerRef.current = newMarker;
@@ -190,48 +233,67 @@ export default function OnboardingStep4LocationForm() {
         });
       }
     }
-  };
+  }, [setValue, reverseGeocode]);
 
-  const reverseGeocode = async (lng: number, lat: number) => {
-    try {
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`
-      );
-      const data = await response.json();
+  // Keep ref updated with latest handleLocationSelect
+  useEffect(() => {
+    handleLocationSelectRef.current = handleLocationSelect;
+  }, [handleLocationSelect]);
 
-      if (data.features && data.features.length > 0) {
-        const feature = data.features[0];
-        const context = feature.context || [];
+  // Store initial coordinates for map initialization (uses localStorage data if available)
+  const initialCoordsRef = useRef({
+    lat: initialLocationData.latitude,
+    lng: initialLocationData.longitude,
+  });
 
-        // Extract address components
-        const fullAddress = feature.place_name || "";
-        const address = feature.place_name?.split(",")[0] || "";
-        const city =
-          context.find((c: { id: string; text: string }) => c.id.includes("place"))?.text || "";
-        const province =
-          context.find((c: { id: string; text: string }) => c.id.includes("region"))?.text || "";
+  // Initialize map
+  useEffect(() => {
+    if (!mapContainerRef.current || mapRef.current) return;
 
-        // Update selectedLocation state for display
-        setSelectedLocation((prev) =>
-          prev
-            ? {
-                ...prev,
-                address: fullAddress,
-                city: city,
-                province: province,
-              }
-            : null
-        );
+    const { lat, lng } = initialCoordsRef.current;
 
-        // Update form values for backend submission
-        setValue("address", address);
-        setValue("city", city);
-        setValue("province", province);
+    mapRef.current = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: "mapbox://styles/rogenecarl/cmcoe04d8008l01sq35v2hqdt",
+      center: [lng, lat],
+      zoom: 12,
+      attributionControl: false,
+      logoPosition: "bottom-right",
+    });
+
+    mapRef.current.on("load", () => {
+      // Add initial marker
+      if (mapRef.current) {
+        const initialMarker = new mapboxgl.Marker({
+          color: "#3B82F6",
+          draggable: true,
+        })
+          .setLngLat([lng, lat])
+          .addTo(mapRef.current);
+
+        // Handle marker drag
+        initialMarker.on("dragend", () => {
+          const newLngLat = initialMarker.getLngLat();
+          handleLocationSelectRef.current?.(newLngLat.lng, newLngLat.lat, false); // Don't animate on drag
+        });
+
+        markerRef.current = initialMarker;
       }
-    } catch (error) {
-      console.error("Reverse geocoding error:", error);
-    }
-  };
+    });
+
+    // Handle map clicks
+    mapRef.current.on("click", (e) => {
+      const { lng, lat } = e.lngLat;
+      handleLocationSelectRef.current?.(lng, lat, true); // Animate on click
+    });
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, []);
 
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {

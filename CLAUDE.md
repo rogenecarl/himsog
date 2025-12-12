@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Healthcare geolocation platform (Himsog) built with Next.js 16, Prisma with Accelerate, and Better Auth. Enables users to find healthcare providers, book appointments, and communicate via messaging. Providers can manage services, schedules, and view analytics. Admins verify providers and manage categories.
+Healthcare geolocation platform (Himsog) built with Next.js 16, Prisma, and Better Auth. Enables users to find healthcare providers, book appointments, and communicate via messaging. Providers can manage services, schedules, and view analytics. Admins verify providers and manage categories.
+
+**Deployment:** Azure App Service + Azure PostgreSQL Flexible Server + Supabase (storage/realtime only)
 
 ## Commands
 
@@ -17,25 +19,29 @@ bun lint                   # Run ESLint
 # Database
 bunx prisma studio         # Database GUI
 bunx prisma migrate dev    # Run migrations
-bunx prisma generate       # Generate Prisma client
+bunx prisma generate       # Generate Prisma client (output: src/lib/generated/prisma)
 
 # Seeding
-bun prisma/seed-providers.ts
-bun prisma/seed-insurance.ts
-bun prisma/seed-analytics.ts
+bun run seed:providers-v2  # Seed provider data
+bun run seed:bookings      # Seed booking data
+bun run seed:insurance     # Seed insurance providers
+bun run seed:analytics     # Seed analytics data
 ```
 
 ## Tech Stack
 
 - **Framework:** Next.js 16 (App Router + Server Actions)
-- **Database:** PostgreSQL with Prisma Accelerate extension
+- **Database:** PostgreSQL (Azure) with Prisma
 - **Auth:** Better Auth (email/password + Google OAuth)
 - **State:** Zustand (persistent stores) + React Query (async data)
 - **UI:** shadcn/ui + Tailwind CSS 4 + Framer Motion
 - **Forms:** React Hook Form + Zod 4
 - **Maps:** Mapbox GL
-- **AI Chat:** Google Generative AI (Gemini 2.5 Flash)
-- **File Storage:** Supabase
+- **AI Chat:** Google Generative AI (Gemini)
+- **File Storage:** Supabase Storage
+- **Realtime:** Supabase Realtime (broadcast channels for messaging)
+- **Email:** Resend
+- **Mobile:** Capacitor (Android)
 
 ## Architecture
 
@@ -51,6 +57,7 @@ src/
 ├── schemas/           # Zod validation schemas (*.schema.ts)
 ├── context/           # React Context (QueryProvider, UserContext)
 ├── lib/               # Core utilities (auth.ts, prisma.ts, gemini.ts)
+│   └── generated/prisma/  # Prisma generated client
 └── types/             # TypeScript types
 ```
 
@@ -59,7 +66,6 @@ src/
 All mutations use Server Actions in `/src/actions/`. Return type: `ActionResponse<T>` with `{success, data/error}`.
 
 ```typescript
-// Example usage
 const result = await createAppointment(data);
 if (result.success) {
   // handle result.data
@@ -67,6 +73,12 @@ if (result.success) {
   // handle result.error
 }
 ```
+
+### Supabase Usage (Storage + Realtime Only)
+
+Supabase is NOT used for database or auth. Only for:
+- **Storage:** `src/lib/supabase-client.ts` - File uploads (cover photos, documents) to `HimsogStorage` bucket
+- **Realtime:** `src/lib/supabase/client.ts` - Broadcast channels for chat messaging
 
 ### Zustand Stores (Persistent)
 
@@ -95,7 +107,7 @@ Auth utilities in `/src/actions/auth/auth-check-utils.ts`: `getCurrentUser()`, `
 ### Database Models
 
 Core: User, Session, Account, Verification
-Provider: Provider (with status: PENDING/VERIFIED/SUSPENDED/REJECTED), Category, Service, OperatingHour, BreakTime
+Provider: Provider (status: PENDING/VERIFIED/SUSPENDED/REJECTED), Category, Service, OperatingHour, BreakTime
 Features: Appointment, AppointmentService, Review, Conversation, Message, Notification, Document
 
 ### API Routes
@@ -116,10 +128,11 @@ Features: Appointment, AppointmentService, Review, Conversation, Message, Notifi
 Required:
 - `DATABASE_URL`, `DIRECT_URL` - PostgreSQL connection strings
 - `BETTER_AUTH_SECRET` - Min 32 chars
-- `BETTER_AUTH_URL` - Auth endpoint URL
+- `BETTER_AUTH_URL`, `NEXT_PUBLIC_APP_URL` - App URLs
 - `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` - Mapbox maps
 - `GEMINI_API_KEY` - AI chatbot
-- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` - File storage
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY` - File storage & Realtime
+- `RESEND_API_KEY` - Email service
 
 Optional:
 - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` - Google OAuth

@@ -2,7 +2,7 @@
 
 import { useProviderById } from "@/hooks/use-create-provider-profile";
 import { useParams } from "next/navigation";
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import AppointmentStep1 from "@/components/(public)/set-appointment-components/appointment-step-1";
@@ -33,6 +33,19 @@ export default function ProviderSetAppointmentPage() {
 
   const [step, setStep] = useState(1)
 
+  // Refs for cleanup effect to access latest values
+  const stepRef = useRef(step);
+  const clearDataRef = useRef(clearData);
+
+  // Keep refs updated
+  useEffect(() => {
+    stepRef.current = step;
+  }, [step]);
+
+  useEffect(() => {
+    clearDataRef.current = clearData;
+  }, [clearData]);
+
   // Initialize provider ID in store when component mounts
   useEffect(() => {
     if (uuid && uuid !== providerId) {
@@ -44,8 +57,8 @@ export default function ProviderSetAppointmentPage() {
   useEffect(() => {
     return () => {
       // Only clear if user navigates away without completing
-      if (step < 3) {
-        clearData();
+      if (stepRef.current < 3) {
+        clearDataRef.current();
       }
     };
   }, []);

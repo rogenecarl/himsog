@@ -97,15 +97,16 @@ export default function CalendarPage() {
   const { data: provider } = useProviderProfile();
 
   // Extract operating hours from provider profile
+  const providerOperatingHours = provider?.operatingHours;
   const operatingHours = useMemo(() => {
-    if (!provider?.operatingHours) return [];
-    return provider.operatingHours.map(h => ({
+    if (!providerOperatingHours) return [];
+    return providerOperatingHours.map(h => ({
       dayOfWeek: h.dayOfWeek,
       startTime: h.startTime,
       endTime: h.endTime,
       isClosed: h.isClosed,
     }));
-  }, [provider?.operatingHours]);
+  }, [providerOperatingHours]);
 
   // Calculate date range based on view
   const dateRange = useMemo(() => {

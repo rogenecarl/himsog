@@ -38,6 +38,19 @@ export function useProviderProfile() {
     });
 }
 
+// Custom error class to preserve redirect information
+class ProviderProfileError extends Error {
+    redirectTo?: string;
+    field?: string;
+
+    constructor(message: string, redirectTo?: string, field?: string) {
+        super(message);
+        this.name = "ProviderProfileError";
+        this.redirectTo = redirectTo;
+        this.field = field;
+    }
+}
+
 // Create provider profile mutation
 export function useCreateProviderProfile() {
     const queryClient = useQueryClient();
@@ -47,7 +60,18 @@ export function useCreateProviderProfile() {
         mutationFn: async (formData: FormData) => {
             const result = await createProviderProfile(formData);
             if (!result.success) {
-                throw new Error(result.error);
+                // Check if the error has redirect information (for uniqueness validation errors)
+                const errorResult = result as {
+                    success: false;
+                    error: string;
+                    redirectTo?: string;
+                    field?: string;
+                };
+                throw new ProviderProfileError(
+                    errorResult.error,
+                    errorResult.redirectTo,
+                    errorResult.field
+                );
             }
             return result.data;
         },
@@ -61,7 +85,17 @@ export function useCreateProviderProfile() {
             router.push("/provider/dashboard");
         },
         onError: (error: Error) => {
-            toast.error(error.message || "Failed to create provider profile");
+            // Check if this is a uniqueness validation error with redirect
+            if (error instanceof ProviderProfileError && error.redirectTo) {
+                toast.error(error.message, {
+                    description: "Please correct the information and try again.",
+                    duration: 5000,
+                });
+                // Redirect to the appropriate step
+                router.push(error.redirectTo);
+            } else {
+                toast.error(error.message || "Failed to create provider profile");
+            }
         },
     });
 }

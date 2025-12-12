@@ -6,20 +6,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useOnboardingCreateProviderProfileStore } from "@/store/create-provider-profile-store";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   AlertCircle,
   ChevronLeft,
-  ChevronRight,
   Image as ImageIcon,
   Loader2,
   Upload,
   X,
   Sparkles,
   CheckCircle2,
-  Info,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState, useCallback } from "react";
 import { useCreateProviderProfile } from "@/hooks/use-create-provider-profile";
 import Image from "next/image";
@@ -42,7 +38,6 @@ const formatFileSize = (bytes: number): string => {
 };
 
 export default function OnboardingSummaryForm() {
-  const router = useRouter();
 
   const allStoredData = useOnboardingCreateProviderProfileStore(
     (state) => state
