@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: himsog-app # Change this to your Azure Web App name
+  AZURE_WEBAPP_NAME: himsog # Your Azure Web App name
   NODE_VERSION: "20.x"
 
 jobs:
@@ -24,15 +24,18 @@ jobs:
           bun-version: latest
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: bun install --ignore-scripts
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Generate Prisma Client
         run: bunx prisma generate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Build Next.js app
         run: bun run build
         env:
-          # These are needed at build time for Next.js
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
