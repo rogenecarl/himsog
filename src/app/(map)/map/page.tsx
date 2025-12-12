@@ -78,6 +78,13 @@ function MapContent() {
     const [userLocation, setUserLocation] = useState<[number, number] | null>(
         null
     );
+
+    // Destination parameters for auto-navigation (from appointments page)
+    const destLat = searchParams.get("dest_lat");
+    const destLng = searchParams.get("dest_lng");
+    const destName = searchParams.get("dest_name");
+    const hasAutoNavDestination = destLat && destLng;
+    const autoNavTriggered = useRef<boolean>(false);
     const [routeData, setRouteData] = useState<{
         geometry: { coordinates: [number, number][] };
         distance: number;
@@ -798,6 +805,49 @@ function MapContent() {
         // Get directions and start navigation mode
         getDirections(destination, false, true);
     }, [userLocation, getDirections]);
+
+    // Auto-trigger navigation when destination params are provided (from appointments page)
+    useEffect(() => {
+        if (
+            hasAutoNavDestination &&
+            userLocation &&
+            !autoNavTriggered.current &&
+            map.current
+        ) {
+            autoNavTriggered.current = true;
+            const destination: [number, number] = [
+                parseFloat(destLng!),
+                parseFloat(destLat!),
+            ];
+
+            // Show toast with destination name
+            if (destName) {
+                toast.info(`Getting directions to ${destName}...`, { duration: 2000 });
+            }
+
+            // Fly to destination first
+            map.current.flyTo({
+                center: destination,
+                zoom: 15,
+                duration: 800,
+            });
+
+            // Start navigation after a short delay to let the map settle
+            setTimeout(() => {
+                startNavigation(destination);
+            }, 1000);
+
+            // Clear the URL params to prevent re-triggering on page reload
+            const newParams = new URLSearchParams(searchParams.toString());
+            newParams.delete("dest_lat");
+            newParams.delete("dest_lng");
+            newParams.delete("dest_name");
+            newParams.delete("dest_id");
+            const queryString = newParams.toString();
+            const newURL = queryString ? `${pathname}?${queryString}` : pathname;
+            router.replace(newURL);
+        }
+    }, [hasAutoNavDestination, userLocation, destLat, destLng, destName, startNavigation, searchParams, pathname, router]);
 
     // Handle live navigation updates - route line trimming, camera following, and rerouting
     useEffect(() => {

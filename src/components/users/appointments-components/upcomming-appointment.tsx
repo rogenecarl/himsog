@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, MapPin, User, X, Loader2 } from "lucide-react";
+import { Calendar, MapPin, User, X, Loader2, Navigation } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -36,6 +37,8 @@ interface UpcomingAppointmentsProps {
       healthcareName: string;
       coverPhoto?: string | null;
       address?: string | null;
+      latitude?: number | null;
+      longitude?: number | null;
       category?: {
         name: string;
         color: string;
@@ -72,6 +75,7 @@ export default function UpcomingAppointments({
   appointments,
   onAppointmentCancelled,
 }: UpcomingAppointmentsProps) {
+  const router = useRouter();
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState("");
@@ -79,6 +83,26 @@ export default function UpcomingAppointments({
 
   const cancelMutation = useCancelUserAppointment();
   const isCancelling = cancelMutation.isPending;
+
+  // Navigate to map with destination coordinates for directions
+  const handleNavigateToProvider = (provider: {
+    id: string;
+    healthcareName: string;
+    latitude?: number | null;
+    longitude?: number | null;
+  }) => {
+    if (!provider.latitude || !provider.longitude) {
+      return;
+    }
+    // Navigate to map page with destination coordinates
+    const params = new URLSearchParams({
+      dest_lat: provider.latitude.toString(),
+      dest_lng: provider.longitude.toString(),
+      dest_name: provider.healthcareName,
+      dest_id: provider.id,
+    });
+    router.push(`/map?${params.toString()}`);
+  };
 
   const handleCancelClick = (appointmentId: string) => {
     setSelectedAppointment(appointmentId);
@@ -212,7 +236,17 @@ export default function UpcomingAppointments({
                       <div className="w-6 h-6 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center shrink-0 text-blue-500 dark:text-blue-400">
                         <MapPin size={14} />
                       </div>
-                      <span className="truncate">{apt.provider.address}</span>
+                      <span className="truncate flex-1">{apt.provider.address}</span>
+                      {apt.provider.latitude && apt.provider.longitude && (
+                        <button
+                          onClick={() => handleNavigateToProvider(apt.provider)}
+                          className="w-8 h-8 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center shrink-0 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors"
+                          title="Get directions"
+                          aria-label="Navigate to provider location"
+                        >
+                          <Navigation size={14} />
+                        </button>
+                      )}
                     </div>
                   )}
 

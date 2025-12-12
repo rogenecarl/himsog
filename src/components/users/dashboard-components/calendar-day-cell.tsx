@@ -1,5 +1,7 @@
 "use client"
 
+import { useRouter } from "next/navigation"
+
 interface Appointment {
   id: string;
   status: keyof typeof statusColors;
@@ -27,6 +29,12 @@ const statusColors = {
 }
 
 export default function CalendarDayCell({ day, isCurrentMonth, isToday, appointments }: CalendarDayCellProps) {
+  const router = useRouter()
+
+  const handleAppointmentClick = (appointmentId: string) => {
+    router.push(`/appointments?highlight=${appointmentId}`)
+  }
+
   const formatTime = (dateStr: Date) => {
     const date = new Date(dateStr)
     // Use local time components to avoid timezone conversion issues
@@ -72,6 +80,7 @@ export default function CalendarDayCell({ day, isCurrentMonth, isToday, appointm
           return (
             <div
               key={apt.id}
+              onClick={() => handleAppointmentClick(apt.id)}
               className={`text-xs px-2 py-1 rounded truncate cursor-pointer hover:opacity-80 transition-opacity border ${colors.bg} ${colors.text} ${colors.border}`}
               title={`${providerName} - ${formatTime(apt.startTime)}`}
             >
@@ -81,7 +90,10 @@ export default function CalendarDayCell({ day, isCurrentMonth, isToday, appointm
           )
         })}
         {appointments.length > 2 && (
-          <div className="text-xs text-gray-600 dark:text-slate-400 font-medium px-2">
+          <div
+            onClick={() => router.push("/appointments")}
+            className="text-xs text-gray-600 dark:text-slate-400 font-medium px-2 cursor-pointer hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
+          >
             +{appointments.length - 2} more
           </div>
         )}
