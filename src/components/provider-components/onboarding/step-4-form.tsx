@@ -127,7 +127,7 @@ export default function OnboardingStep4LocationForm() {
   const watchedLng = watch("longitude");
 
   // Ref to store the latest handleLocationSelect function
-  const handleLocationSelectRef = useRef<(lng: number, lat: number, shouldAnimate?: boolean) => void>();
+  const handleLocationSelectRef = useRef<((lng: number, lat: number, shouldAnimate?: boolean) => void) | undefined>(undefined);
 
   // Define reverseGeocode as a callback (needed before handleLocationSelect)
   const reverseGeocode = useCallback(async (lng: number, lat: number) => {
