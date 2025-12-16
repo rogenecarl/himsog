@@ -6,6 +6,19 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { AppointmentStatus, Prisma } from "@/lib/generated/prisma";
 import { format } from "date-fns";
+import { resend, FROM_EMAIL } from "@/lib/resend";
+import {
+  getAppointmentConfirmationEmailHtml,
+  type AppointmentEmailOptions,
+} from "@/lib/email-template";
+
+// Helper to format price
+function formatPrice(price: number): string {
+  return new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+  }).format(price);
+}
 
 // Get provider's appointments with filters
 export async function getProviderAppointments(filters?: {
@@ -290,7 +303,7 @@ export async function updateAppointmentStatus(
 
     const provider = await prisma.provider.findUnique({
       where: { userId: session.user.id },
-      select: { id: true, healthcareName: true },
+      select: { id: true, healthcareName: true, address: true, city: true, province: true },
     });
 
     if (!provider) {
@@ -323,6 +336,7 @@ export async function updateAppointmentStatus(
         data: {
           status,
           ...(status === "COMPLETED" && activityNotes ? { activityNotes } : {}),
+          ...(status === "CONFIRMED" ? { confirmationEmailSentAt: new Date() } : {}),
         },
         include: {
           user: {
@@ -373,6 +387,36 @@ export async function updateAppointmentStatus(
 
       return updated;
     });
+
+    // Send confirmation email when status is CONFIRMED
+    if (status === "CONFIRMED") {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+      const emailOptions: AppointmentEmailOptions = {
+        patientName: appointment.patientName,
+        patientEmail: appointment.patientEmail,
+        providerName: provider.healthcareName,
+        providerAddress: `${provider.address}, ${provider.city}, ${provider.province}`,
+        appointmentNumber: appointment.appointmentNumber,
+        appointmentDate: format(appointment.startTime, "MMMM d, yyyy"),
+        appointmentTime: format(appointment.startTime, "h:mm a"),
+        services: updatedAppointment.services.map((s) => s.service.name),
+        totalPrice: formatPrice(Number(appointment.totalPrice)),
+        appointmentUrl: `${appUrl}/dashboard/appointments`,
+      };
+
+      try {
+        await resend.emails.send({
+          from: FROM_EMAIL,
+          to: appointment.patientEmail,
+          subject: "Your Appointment has been Confirmed!",
+          html: getAppointmentConfirmationEmailHtml(emailOptions),
+        });
+      } catch (emailError) {
+        // Log the error but don't fail the entire operation
+        console.error("Failed to send confirmation email:", emailError);
+      }
+    }
 
     revalidatePath("/provider/appointments");
     revalidatePath("/dashboard");

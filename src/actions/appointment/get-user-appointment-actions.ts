@@ -359,3 +359,31 @@ export async function getAppointmentStats() {
         };
     }
 }
+
+// Lightweight function to get only upcoming appointment count (optimized for sidebar badge)
+export async function getUpcomingAppointmentCount() {
+    try {
+        const session = await auth.api.getSession({
+            headers: await headers(),
+        });
+
+        if (!session?.user) {
+            return { success: false, error: "Not authenticated", data: 0 };
+        }
+
+        const now = new Date();
+
+        const count = await prisma.appointment.count({
+            where: {
+                userId: session.user.id,
+                startTime: { gte: now },
+                status: { in: ["PENDING", "CONFIRMED"] },
+            },
+        });
+
+        return { success: true, data: count };
+    } catch (error) {
+        console.error("Error fetching upcoming appointment count:", error);
+        return { success: false, error: "Failed to fetch count", data: 0 };
+    }
+}

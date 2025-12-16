@@ -17896,6 +17896,9 @@ export namespace Prisma {
     cancelledAt: Date | null
     cancellationReason: string | null
     cancelledBy: string | null
+    confirmationEmailSentAt: Date | null
+    reminder24hSentAt: Date | null
+    reminder1hSentAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -17917,6 +17920,9 @@ export namespace Prisma {
     cancelledAt: Date | null
     cancellationReason: string | null
     cancelledBy: string | null
+    confirmationEmailSentAt: Date | null
+    reminder24hSentAt: Date | null
+    reminder1hSentAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -17938,6 +17944,9 @@ export namespace Prisma {
     cancelledAt: number
     cancellationReason: number
     cancelledBy: number
+    confirmationEmailSentAt: number
+    reminder24hSentAt: number
+    reminder1hSentAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -17969,6 +17978,9 @@ export namespace Prisma {
     cancelledAt?: true
     cancellationReason?: true
     cancelledBy?: true
+    confirmationEmailSentAt?: true
+    reminder24hSentAt?: true
+    reminder1hSentAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -17990,6 +18002,9 @@ export namespace Prisma {
     cancelledAt?: true
     cancellationReason?: true
     cancelledBy?: true
+    confirmationEmailSentAt?: true
+    reminder24hSentAt?: true
+    reminder1hSentAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -18011,6 +18026,9 @@ export namespace Prisma {
     cancelledAt?: true
     cancellationReason?: true
     cancelledBy?: true
+    confirmationEmailSentAt?: true
+    reminder24hSentAt?: true
+    reminder1hSentAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -18119,6 +18137,9 @@ export namespace Prisma {
     cancelledAt: Date | null
     cancellationReason: string | null
     cancelledBy: string | null
+    confirmationEmailSentAt: Date | null
+    reminder24hSentAt: Date | null
+    reminder1hSentAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: AppointmentCountAggregateOutputType | null
@@ -18159,6 +18180,9 @@ export namespace Prisma {
     cancelledAt?: boolean
     cancellationReason?: boolean
     cancelledBy?: boolean
+    confirmationEmailSentAt?: boolean
+    reminder24hSentAt?: boolean
+    reminder1hSentAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -18187,6 +18211,9 @@ export namespace Prisma {
     cancelledAt?: boolean
     cancellationReason?: boolean
     cancelledBy?: boolean
+    confirmationEmailSentAt?: boolean
+    reminder24hSentAt?: boolean
+    reminder1hSentAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -18211,6 +18238,9 @@ export namespace Prisma {
     cancelledAt?: boolean
     cancellationReason?: boolean
     cancelledBy?: boolean
+    confirmationEmailSentAt?: boolean
+    reminder24hSentAt?: boolean
+    reminder1hSentAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -18235,11 +18265,14 @@ export namespace Prisma {
     cancelledAt?: boolean
     cancellationReason?: boolean
     cancelledBy?: boolean
+    confirmationEmailSentAt?: boolean
+    reminder24hSentAt?: boolean
+    reminder1hSentAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type AppointmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "appointmentNumber" | "userId" | "providerId" | "startTime" | "endTime" | "status" | "notes" | "totalPrice" | "patientName" | "patientEmail" | "patientPhone" | "activityNotes" | "cancelledAt" | "cancellationReason" | "cancelledBy" | "createdAt" | "updatedAt", ExtArgs["result"]["appointment"]>
+  export type AppointmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "appointmentNumber" | "userId" | "providerId" | "startTime" | "endTime" | "status" | "notes" | "totalPrice" | "patientName" | "patientEmail" | "patientPhone" | "activityNotes" | "cancelledAt" | "cancellationReason" | "cancelledBy" | "confirmationEmailSentAt" | "reminder24hSentAt" | "reminder1hSentAt" | "createdAt" | "updatedAt", ExtArgs["result"]["appointment"]>
   export type AppointmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     provider?: boolean | ProviderDefaultArgs<ExtArgs>
@@ -18287,6 +18320,9 @@ export namespace Prisma {
       cancelledAt: Date | null
       cancellationReason: string | null
       cancelledBy: string | null
+      confirmationEmailSentAt: Date | null
+      reminder24hSentAt: Date | null
+      reminder1hSentAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["appointment"]>
@@ -18734,6 +18770,9 @@ export namespace Prisma {
     readonly cancelledAt: FieldRef<"Appointment", 'DateTime'>
     readonly cancellationReason: FieldRef<"Appointment", 'String'>
     readonly cancelledBy: FieldRef<"Appointment", 'String'>
+    readonly confirmationEmailSentAt: FieldRef<"Appointment", 'DateTime'>
+    readonly reminder24hSentAt: FieldRef<"Appointment", 'DateTime'>
+    readonly reminder1hSentAt: FieldRef<"Appointment", 'DateTime'>
     readonly createdAt: FieldRef<"Appointment", 'DateTime'>
     readonly updatedAt: FieldRef<"Appointment", 'DateTime'>
   }
@@ -30947,6 +30986,9 @@ export namespace Prisma {
     cancelledAt: 'cancelledAt',
     cancellationReason: 'cancellationReason',
     cancelledBy: 'cancelledBy',
+    confirmationEmailSentAt: 'confirmationEmailSentAt',
+    reminder24hSentAt: 'reminder24hSentAt',
+    reminder1hSentAt: 'reminder1hSentAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -32415,6 +32457,9 @@ export namespace Prisma {
     cancelledAt?: DateTimeNullableFilter<"Appointment"> | Date | string | null
     cancellationReason?: StringNullableFilter<"Appointment"> | string | null
     cancelledBy?: StringNullableFilter<"Appointment"> | string | null
+    confirmationEmailSentAt?: DateTimeNullableFilter<"Appointment"> | Date | string | null
+    reminder24hSentAt?: DateTimeNullableFilter<"Appointment"> | Date | string | null
+    reminder1hSentAt?: DateTimeNullableFilter<"Appointment"> | Date | string | null
     createdAt?: DateTimeFilter<"Appointment"> | Date | string
     updatedAt?: DateTimeFilter<"Appointment"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -32442,6 +32487,9 @@ export namespace Prisma {
     cancelledAt?: SortOrderInput | SortOrder
     cancellationReason?: SortOrderInput | SortOrder
     cancelledBy?: SortOrderInput | SortOrder
+    confirmationEmailSentAt?: SortOrderInput | SortOrder
+    reminder24hSentAt?: SortOrderInput | SortOrder
+    reminder1hSentAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -32472,6 +32520,9 @@ export namespace Prisma {
     cancelledAt?: DateTimeNullableFilter<"Appointment"> | Date | string | null
     cancellationReason?: StringNullableFilter<"Appointment"> | string | null
     cancelledBy?: StringNullableFilter<"Appointment"> | string | null
+    confirmationEmailSentAt?: DateTimeNullableFilter<"Appointment"> | Date | string | null
+    reminder24hSentAt?: DateTimeNullableFilter<"Appointment"> | Date | string | null
+    reminder1hSentAt?: DateTimeNullableFilter<"Appointment"> | Date | string | null
     createdAt?: DateTimeFilter<"Appointment"> | Date | string
     updatedAt?: DateTimeFilter<"Appointment"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -32499,6 +32550,9 @@ export namespace Prisma {
     cancelledAt?: SortOrderInput | SortOrder
     cancellationReason?: SortOrderInput | SortOrder
     cancelledBy?: SortOrderInput | SortOrder
+    confirmationEmailSentAt?: SortOrderInput | SortOrder
+    reminder24hSentAt?: SortOrderInput | SortOrder
+    reminder1hSentAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: AppointmentCountOrderByAggregateInput
@@ -32528,6 +32582,9 @@ export namespace Prisma {
     cancelledAt?: DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
     cancellationReason?: StringNullableWithAggregatesFilter<"Appointment"> | string | null
     cancelledBy?: StringNullableWithAggregatesFilter<"Appointment"> | string | null
+    confirmationEmailSentAt?: DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
+    reminder24hSentAt?: DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
+    reminder1hSentAt?: DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Appointment"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Appointment"> | Date | string
   }
@@ -34470,6 +34527,9 @@ export namespace Prisma {
     activityNotes?: string | null
     cancelledAt?: Date | string | null
     cancellationReason?: string | null
+    confirmationEmailSentAt?: Date | string | null
+    reminder24hSentAt?: Date | string | null
+    reminder1hSentAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutAppointmentsInput
@@ -34497,6 +34557,9 @@ export namespace Prisma {
     cancelledAt?: Date | string | null
     cancellationReason?: string | null
     cancelledBy?: string | null
+    confirmationEmailSentAt?: Date | string | null
+    reminder24hSentAt?: Date | string | null
+    reminder1hSentAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     services?: AppointmentServiceUncheckedCreateNestedManyWithoutAppointmentInput
@@ -34518,6 +34581,9 @@ export namespace Prisma {
     activityNotes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -34545,6 +34611,9 @@ export namespace Prisma {
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     services?: AppointmentServiceUncheckedUpdateManyWithoutAppointmentNestedInput
@@ -34569,6 +34638,9 @@ export namespace Prisma {
     cancelledAt?: Date | string | null
     cancellationReason?: string | null
     cancelledBy?: string | null
+    confirmationEmailSentAt?: Date | string | null
+    reminder24hSentAt?: Date | string | null
+    reminder1hSentAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -34587,6 +34659,9 @@ export namespace Prisma {
     activityNotes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -34608,6 +34683,9 @@ export namespace Prisma {
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -36507,6 +36585,9 @@ export namespace Prisma {
     cancelledAt?: SortOrder
     cancellationReason?: SortOrder
     cancelledBy?: SortOrder
+    confirmationEmailSentAt?: SortOrder
+    reminder24hSentAt?: SortOrder
+    reminder1hSentAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -36532,6 +36613,9 @@ export namespace Prisma {
     cancelledAt?: SortOrder
     cancellationReason?: SortOrder
     cancelledBy?: SortOrder
+    confirmationEmailSentAt?: SortOrder
+    reminder24hSentAt?: SortOrder
+    reminder1hSentAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -36553,6 +36637,9 @@ export namespace Prisma {
     cancelledAt?: SortOrder
     cancellationReason?: SortOrder
     cancelledBy?: SortOrder
+    confirmationEmailSentAt?: SortOrder
+    reminder24hSentAt?: SortOrder
+    reminder1hSentAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -40172,6 +40259,9 @@ export namespace Prisma {
     activityNotes?: string | null
     cancelledAt?: Date | string | null
     cancellationReason?: string | null
+    confirmationEmailSentAt?: Date | string | null
+    reminder24hSentAt?: Date | string | null
+    reminder1hSentAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     provider: ProviderCreateNestedOneWithoutAppointmentsInput
@@ -40197,6 +40287,9 @@ export namespace Prisma {
     cancelledAt?: Date | string | null
     cancellationReason?: string | null
     cancelledBy?: string | null
+    confirmationEmailSentAt?: Date | string | null
+    reminder24hSentAt?: Date | string | null
+    reminder1hSentAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     services?: AppointmentServiceUncheckedCreateNestedManyWithoutAppointmentInput
@@ -40228,6 +40321,9 @@ export namespace Prisma {
     activityNotes?: string | null
     cancelledAt?: Date | string | null
     cancellationReason?: string | null
+    confirmationEmailSentAt?: Date | string | null
+    reminder24hSentAt?: Date | string | null
+    reminder1hSentAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutAppointmentsInput
@@ -40253,6 +40349,9 @@ export namespace Prisma {
     activityNotes?: string | null
     cancelledAt?: Date | string | null
     cancellationReason?: string | null
+    confirmationEmailSentAt?: Date | string | null
+    reminder24hSentAt?: Date | string | null
+    reminder1hSentAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     services?: AppointmentServiceUncheckedCreateNestedManyWithoutAppointmentInput
@@ -40976,6 +41075,9 @@ export namespace Prisma {
     cancelledAt?: DateTimeNullableFilter<"Appointment"> | Date | string | null
     cancellationReason?: StringNullableFilter<"Appointment"> | string | null
     cancelledBy?: StringNullableFilter<"Appointment"> | string | null
+    confirmationEmailSentAt?: DateTimeNullableFilter<"Appointment"> | Date | string | null
+    reminder24hSentAt?: DateTimeNullableFilter<"Appointment"> | Date | string | null
+    reminder1hSentAt?: DateTimeNullableFilter<"Appointment"> | Date | string | null
     createdAt?: DateTimeFilter<"Appointment"> | Date | string
     updatedAt?: DateTimeFilter<"Appointment"> | Date | string
   }
@@ -41948,6 +42050,9 @@ export namespace Prisma {
     activityNotes?: string | null
     cancelledAt?: Date | string | null
     cancellationReason?: string | null
+    confirmationEmailSentAt?: Date | string | null
+    reminder24hSentAt?: Date | string | null
+    reminder1hSentAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutAppointmentsInput
@@ -41973,6 +42078,9 @@ export namespace Prisma {
     cancelledAt?: Date | string | null
     cancellationReason?: string | null
     cancelledBy?: string | null
+    confirmationEmailSentAt?: Date | string | null
+    reminder24hSentAt?: Date | string | null
+    reminder1hSentAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     services?: AppointmentServiceUncheckedCreateNestedManyWithoutAppointmentInput
@@ -44063,6 +44171,9 @@ export namespace Prisma {
     activityNotes?: string | null
     cancelledAt?: Date | string | null
     cancellationReason?: string | null
+    confirmationEmailSentAt?: Date | string | null
+    reminder24hSentAt?: Date | string | null
+    reminder1hSentAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutAppointmentsInput
@@ -44089,6 +44200,9 @@ export namespace Prisma {
     cancelledAt?: Date | string | null
     cancellationReason?: string | null
     cancelledBy?: string | null
+    confirmationEmailSentAt?: Date | string | null
+    reminder24hSentAt?: Date | string | null
+    reminder1hSentAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     notifications?: NotificationUncheckedCreateNestedManyWithoutAppointmentInput
@@ -44166,6 +44280,9 @@ export namespace Prisma {
     activityNotes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -44192,6 +44309,9 @@ export namespace Prisma {
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     notifications?: NotificationUncheckedUpdateManyWithoutAppointmentNestedInput
@@ -44604,6 +44724,9 @@ export namespace Prisma {
     activityNotes?: string | null
     cancelledAt?: Date | string | null
     cancellationReason?: string | null
+    confirmationEmailSentAt?: Date | string | null
+    reminder24hSentAt?: Date | string | null
+    reminder1hSentAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutAppointmentsInput
@@ -44630,6 +44753,9 @@ export namespace Prisma {
     cancelledAt?: Date | string | null
     cancellationReason?: string | null
     cancelledBy?: string | null
+    confirmationEmailSentAt?: Date | string | null
+    reminder24hSentAt?: Date | string | null
+    reminder1hSentAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     services?: AppointmentServiceUncheckedCreateNestedManyWithoutAppointmentInput
@@ -44804,6 +44930,9 @@ export namespace Prisma {
     activityNotes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -44830,6 +44959,9 @@ export namespace Prisma {
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     services?: AppointmentServiceUncheckedUpdateManyWithoutAppointmentNestedInput
@@ -45453,6 +45585,9 @@ export namespace Prisma {
     activityNotes?: string | null
     cancelledAt?: Date | string | null
     cancellationReason?: string | null
+    confirmationEmailSentAt?: Date | string | null
+    reminder24hSentAt?: Date | string | null
+    reminder1hSentAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutAppointmentsInput
@@ -45479,6 +45614,9 @@ export namespace Prisma {
     cancelledAt?: Date | string | null
     cancellationReason?: string | null
     cancelledBy?: string | null
+    confirmationEmailSentAt?: Date | string | null
+    reminder24hSentAt?: Date | string | null
+    reminder1hSentAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     services?: AppointmentServiceUncheckedCreateNestedManyWithoutAppointmentInput
@@ -45669,6 +45807,9 @@ export namespace Prisma {
     activityNotes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -45695,6 +45836,9 @@ export namespace Prisma {
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     services?: AppointmentServiceUncheckedUpdateManyWithoutAppointmentNestedInput
@@ -46885,6 +47029,9 @@ export namespace Prisma {
     cancelledAt?: Date | string | null
     cancellationReason?: string | null
     cancelledBy?: string | null
+    confirmationEmailSentAt?: Date | string | null
+    reminder24hSentAt?: Date | string | null
+    reminder1hSentAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -46905,6 +47052,9 @@ export namespace Prisma {
     activityNotes?: string | null
     cancelledAt?: Date | string | null
     cancellationReason?: string | null
+    confirmationEmailSentAt?: Date | string | null
+    reminder24hSentAt?: Date | string | null
+    reminder1hSentAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -47290,6 +47440,9 @@ export namespace Prisma {
     activityNotes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     provider?: ProviderUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -47315,6 +47468,9 @@ export namespace Prisma {
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     services?: AppointmentServiceUncheckedUpdateManyWithoutAppointmentNestedInput
@@ -47338,6 +47494,9 @@ export namespace Prisma {
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -47356,6 +47515,9 @@ export namespace Prisma {
     activityNotes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -47381,6 +47543,9 @@ export namespace Prisma {
     activityNotes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     services?: AppointmentServiceUncheckedUpdateManyWithoutAppointmentNestedInput
@@ -47404,6 +47569,9 @@ export namespace Prisma {
     activityNotes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -47959,6 +48127,9 @@ export namespace Prisma {
     cancelledAt?: Date | string | null
     cancellationReason?: string | null
     cancelledBy?: string | null
+    confirmationEmailSentAt?: Date | string | null
+    reminder24hSentAt?: Date | string | null
+    reminder1hSentAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -48121,6 +48292,9 @@ export namespace Prisma {
     activityNotes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -48146,6 +48320,9 @@ export namespace Prisma {
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     services?: AppointmentServiceUncheckedUpdateManyWithoutAppointmentNestedInput
@@ -48169,6 +48346,9 @@ export namespace Prisma {
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancellationReason?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmationEmailSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder24hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminder1hSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

@@ -278,6 +278,9 @@ exports.Prisma.AppointmentScalarFieldEnum = {
   cancelledAt: 'cancelledAt',
   cancellationReason: 'cancellationReason',
   cancelledBy: 'cancelledBy',
+  confirmationEmailSentAt: 'confirmationEmailSentAt',
+  reminder24hSentAt: 'reminder24hSentAt',
+  reminder1hSentAt: 'reminder1hSentAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

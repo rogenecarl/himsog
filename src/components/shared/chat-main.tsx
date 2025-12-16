@@ -11,10 +11,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Send, Loader2, MoreVertical, Info, Smile, Paperclip, ArrowLeft } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState, useRef } from "react"
 import { useChatScroll } from "@/hooks/use-chat-scroll"
 import { type PrivateMessage, usePrivateChat } from "@/hooks/use-private-chat"
 import { useRouter } from "next/navigation"
+import { markMessagesAsRead } from "@/actions/messages/message-action"
+import { useQueryClient } from "@tanstack/react-query"
+import { unreadMessageKeys } from "@/hooks/use-unread-message-count"
 
 interface ChatMainProps {
   conversationId: string
@@ -35,6 +38,7 @@ export function ChatMain({
   initialMessages = [],
 }: ChatMainProps) {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const { containerRef, scrollToBottom } = useChatScroll()
   const {
     messages: realtimeMessages,
@@ -48,6 +52,25 @@ export function ChatMain({
   })
 
   const [newMessage, setNewMessage] = useState("")
+  const hasMarkedAsRead = useRef(false)
+
+  // Mark messages as read when conversation is opened
+  useEffect(() => {
+    if (conversationId && !hasMarkedAsRead.current) {
+      hasMarkedAsRead.current = true
+      markMessagesAsRead(conversationId).then((result) => {
+        if (result.success) {
+          // Invalidate unread message count to update sidebar badge
+          queryClient.invalidateQueries({ queryKey: unreadMessageKeys.count })
+        }
+      })
+    }
+  }, [conversationId, queryClient])
+
+  // Reset the ref when conversation changes
+  useEffect(() => {
+    hasMarkedAsRead.current = false
+  }, [conversationId])
 
   // Initialize with database messages
   useEffect(() => {

@@ -266,6 +266,316 @@ export function getProviderStatusEmailHtml(
   `.trim();
 }
 
+// ============================================================================
+// APPOINTMENT EMAIL TEMPLATES
+// ============================================================================
+
+export interface AppointmentEmailOptions {
+  patientName: string;
+  patientEmail: string;
+  providerName: string;
+  providerAddress: string;
+  appointmentNumber: string;
+  appointmentDate: string; // Formatted date string (e.g., "December 20, 2024")
+  appointmentTime: string; // Formatted time string (e.g., "10:00 AM")
+  services: string[]; // List of service names
+  totalPrice: string; // Formatted price (e.g., "₱1,500.00")
+  appointmentUrl: string; // URL to view appointment details
+}
+
+export function getAppointmentConfirmationEmailHtml(
+  options: AppointmentEmailOptions
+): string {
+  const {
+    patientName,
+    providerName,
+    providerAddress,
+    appointmentNumber,
+    appointmentDate,
+    appointmentTime,
+    services,
+    totalPrice,
+    appointmentUrl,
+  } = options;
+
+  const servicesList = services.map((s) => `<li>${s}</li>`).join("");
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Appointment Confirmed</title>
+    </head>
+    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f5;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f5; padding: 40px 0;">
+        <tr>
+          <td align="center">
+            <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
+              <!-- Success Header -->
+              <tr>
+                <td style="padding: 30px; background-color: #10b981; text-align: center;">
+                  <div style="width: 60px; height: 60px; margin: 0 auto 15px auto; background-color: rgba(255,255,255,0.2); border-radius: 50%; line-height: 60px; font-size: 28px; color: #ffffff;">
+                    ✓
+                  </div>
+                  <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #ffffff;">Appointment Confirmed!</h1>
+                </td>
+              </tr>
+
+              <!-- Content -->
+              <tr>
+                <td style="padding: 40px;">
+                  <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 24px; color: #52525b;">
+                    Hi ${patientName},
+                  </p>
+                  <p style="margin: 0 0 25px 0; font-size: 16px; line-height: 24px; color: #52525b;">
+                    Great news! Your appointment has been confirmed. Here are the details:
+                  </p>
+
+                  <!-- Appointment Details Box -->
+                  <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 25px 0; background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <tr>
+                      <td style="padding: 20px;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                          <tr>
+                            <td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+                              <span style="font-size: 13px; color: #64748b;">Appointment #</span><br>
+                              <span style="font-size: 15px; font-weight: 600; color: #18181b;">${appointmentNumber}</span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                              <span style="font-size: 13px; color: #64748b;">Provider</span><br>
+                              <span style="font-size: 15px; font-weight: 600; color: #18181b;">${providerName}</span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                              <span style="font-size: 13px; color: #64748b;">Location</span><br>
+                              <span style="font-size: 15px; color: #18181b;">${providerAddress}</span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                              <span style="font-size: 13px; color: #64748b;">Date & Time</span><br>
+                              <span style="font-size: 15px; font-weight: 600; color: #18181b;">${appointmentDate} at ${appointmentTime}</span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                              <span style="font-size: 13px; color: #64748b;">Services</span><br>
+                              <ul style="margin: 5px 0 0 0; padding-left: 20px; font-size: 15px; color: #18181b;">
+                                ${servicesList}
+                              </ul>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 12px 0 0 0;">
+                              <span style="font-size: 13px; color: #64748b;">Total Amount</span><br>
+                              <span style="font-size: 18px; font-weight: 700; color: #10b981;">${totalPrice}</span>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+
+                  <!-- Button -->
+                  <table width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td align="center" style="padding: 10px 0 20px 0;">
+                        <a href="${appointmentUrl}" style="display: inline-block; padding: 14px 32px; background-color: #18181b; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: 500;">View Appointment</a>
+                      </td>
+                    </tr>
+                  </table>
+
+                  <p style="margin: 20px 0 0 0; font-size: 14px; line-height: 20px; color: #71717a;">
+                    Please arrive 10-15 minutes before your scheduled appointment time. If you need to reschedule or cancel, please do so at least 24 hours in advance.
+                  </p>
+                </td>
+              </tr>
+
+              <!-- Footer -->
+              <tr>
+                <td style="padding: 30px 40px; border-top: 1px solid #e4e4e7; background-color: #fafafa;">
+                  <p style="margin: 0; font-size: 12px; line-height: 18px; color: #a1a1aa; text-align: center;">
+                    This is an automated message from Himsog Healthcare Platform. Please do not reply to this email.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `.trim();
+}
+
+export type ReminderType = "24h" | "1h";
+
+export function getAppointmentReminderEmailHtml(
+  options: AppointmentEmailOptions,
+  reminderType: ReminderType
+): string {
+  const {
+    patientName,
+    providerName,
+    providerAddress,
+    appointmentNumber,
+    appointmentDate,
+    appointmentTime,
+    services,
+    totalPrice,
+    appointmentUrl,
+  } = options;
+
+  const servicesList = services.map((s) => `<li>${s}</li>`).join("");
+
+  const reminderConfig = {
+    "24h": {
+      title: "Appointment Tomorrow",
+      heading: "Reminder: Your Appointment is Tomorrow",
+      headerColor: "#3b82f6",
+      message: "This is a friendly reminder that you have an appointment scheduled for tomorrow.",
+      urgency: "Please ensure you have everything prepared for your visit.",
+    },
+    "1h": {
+      title: "Appointment in 1 Hour",
+      heading: "Your Appointment is in 1 Hour",
+      headerColor: "#f59e0b",
+      message: "Your appointment is coming up in about 1 hour. Please start making your way to the location.",
+      urgency: "If you're running late, please contact the provider directly.",
+    },
+  };
+
+  const config = reminderConfig[reminderType];
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${config.title}</title>
+    </head>
+    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f5;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f5; padding: 40px 0;">
+        <tr>
+          <td align="center">
+            <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
+              <!-- Reminder Header -->
+              <tr>
+                <td style="padding: 30px; background-color: ${config.headerColor}; text-align: center;">
+                  <div style="width: 60px; height: 60px; margin: 0 auto 15px auto; background-color: rgba(255,255,255,0.2); border-radius: 50%; line-height: 60px; font-size: 28px; color: #ffffff;">
+                    ⏰
+                  </div>
+                  <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #ffffff;">${config.heading}</h1>
+                </td>
+              </tr>
+
+              <!-- Content -->
+              <tr>
+                <td style="padding: 40px;">
+                  <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 24px; color: #52525b;">
+                    Hi ${patientName},
+                  </p>
+                  <p style="margin: 0 0 25px 0; font-size: 16px; line-height: 24px; color: #52525b;">
+                    ${config.message}
+                  </p>
+
+                  <!-- Appointment Details Box -->
+                  <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 25px 0; background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <tr>
+                      <td style="padding: 20px;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                          <tr>
+                            <td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+                              <span style="font-size: 13px; color: #64748b;">Appointment #</span><br>
+                              <span style="font-size: 15px; font-weight: 600; color: #18181b;">${appointmentNumber}</span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                              <span style="font-size: 13px; color: #64748b;">Provider</span><br>
+                              <span style="font-size: 15px; font-weight: 600; color: #18181b;">${providerName}</span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                              <span style="font-size: 13px; color: #64748b;">Location</span><br>
+                              <span style="font-size: 15px; color: #18181b;">${providerAddress}</span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                              <span style="font-size: 13px; color: #64748b;">Date & Time</span><br>
+                              <span style="font-size: 15px; font-weight: 600; color: #18181b;">${appointmentDate} at ${appointmentTime}</span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                              <span style="font-size: 13px; color: #64748b;">Services</span><br>
+                              <ul style="margin: 5px 0 0 0; padding-left: 20px; font-size: 15px; color: #18181b;">
+                                ${servicesList}
+                              </ul>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 12px 0 0 0;">
+                              <span style="font-size: 13px; color: #64748b;">Total Amount</span><br>
+                              <span style="font-size: 18px; font-weight: 700; color: #10b981;">${totalPrice}</span>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+
+                  <!-- Urgency Notice -->
+                  <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 25px 0;">
+                    <tr>
+                      <td style="padding: 16px 20px; background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 0 6px 6px 0;">
+                        <p style="margin: 0; font-size: 14px; line-height: 20px; color: #92400e;">
+                          <strong>Note:</strong> ${config.urgency}
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+
+                  <!-- Button -->
+                  <table width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td align="center" style="padding: 10px 0 20px 0;">
+                        <a href="${appointmentUrl}" style="display: inline-block; padding: 14px 32px; background-color: #18181b; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: 500;">View Appointment</a>
+                      </td>
+                    </tr>
+                  </table>
+
+                  <p style="margin: 20px 0 0 0; font-size: 14px; line-height: 20px; color: #71717a;">
+                    Need to reschedule or cancel? Please log in to your account to manage your appointment.
+                  </p>
+                </td>
+              </tr>
+
+              <!-- Footer -->
+              <tr>
+                <td style="padding: 30px 40px; border-top: 1px solid #e4e4e7; background-color: #fafafa;">
+                  <p style="margin: 0; font-size: 12px; line-height: 18px; color: #a1a1aa; text-align: center;">
+                    This is an automated message from Himsog Healthcare Platform. Please do not reply to this email.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `.trim();
+}
+
 export function getOTPVerificationEmailHtml(
   email: string,
   otp: string,
