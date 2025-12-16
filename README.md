@@ -1,47 +1,80 @@
-# Next.js 16 + Prisma + Better Auth Starter Kit
+# Himsog - Healthcare Information and Medical-Services Search with Online-Booking and Geolocation
 
-A production-ready authentication starter kit built with **Next.js 16**, **Prisma ORM**, and **Better Auth** featuring multi-role authentication system (User, Provider, Admin).
+A comprehensive healthcare geolocation platform built with **Next.js 16**, **Prisma ORM**, and **Better Auth**. Enables users to find healthcare providers, book appointments, and communicate via real-time messaging. Providers can manage services, schedules, and view analytics. Admins verify providers and manage categories.
 
-## ✨ Features
+**Live:** [https://himsog.tech](https://himsog.tech)
 
-- 🚀 **Next.js 16** - Latest App Router with Server Actions
-- 🔐 **Better Auth** - Modern authentication library with email & OAuth support
-- 🗄️ **Prisma ORM** - Type-safe database access with PostgreSQL
-- 👥 **Multi-Role System** - USER, PROVIDER, and ADMIN roles
-- 🎨 **shadcn/ui** - Beautiful, accessible UI components
-- 📝 **React Hook Form + Zod** - Type-safe form validation
-- 🎯 **TypeScript** - Full type safety across the stack
-- 🔔 **Sonner** - Toast notifications
-- ⚡ **Optimized** - Fast server actions with minimal database queries
+## Features
 
-## 🏗️ Tech Stack
+### For Users (Patients)
+- Browse healthcare providers by category and location
+- Interactive map-based provider discovery with Mapbox
+- Advanced search with filters (category, location, rating)
+- View provider details (services, hours, reviews, location)
+- Book appointments with multi-service selection and date/time picker
+- View appointment history and status tracking
+- Real-time private messaging with providers
+- Submit reviews and ratings (with anonymous option)
+- Personal dashboard with appointment calendar
+- AI-powered chatbot for healthcare assistance
 
-- **Framework:** Next.js 16 (App Router)
-- **Database:** PostgreSQL with Prisma ORM
-- **Authentication:** Better Auth
-- **Styling:** Tailwind CSS
-- **UI Components:** shadcn/ui
-- **Form Handling:** React Hook Form
-- **Validation:** Zod
-- **Type Safety:** TypeScript
-- **Package Manager:** Bun (or npm/pnpm/yarn)
+### For Healthcare Providers
+- 4-step onboarding process (profile, services, hours, verification)
+- Service management with flexible pricing models (Fixed, Range, Inquire)
+- Appointment management (view, confirm, cancel, complete)
+- Calendar view with availability management
+- Analytics dashboard:
+  - Appointment trends and revenue tracking
+  - Popular services analysis
+  - Peak hours and cancellation insights
+- Review management with response capability
+- Document verification tracking
+- Real-time messaging with patients
 
-## 📋 Prerequisites
+### For Administrators
+- Dashboard with key system metrics
+- Provider verification workflow (review documents, approve/reject)
+- Category management (CRUD operations)
+- User management (suspend/reactivate, view activity)
+- System-wide analytics and reports
+- Audit log for all admin actions
+- Feedback management system
 
-Before you begin, ensure you have the following installed:
+## Tech Stack
 
-- **Node.js** 18.17 or later
+| Category | Technology |
+|----------|------------|
+| **Framework** | Next.js 16.0.7 (App Router + Server Actions) |
+| **Language** | TypeScript 5 |
+| **Database** | PostgreSQL (Azure Flexible Server) + Prisma ORM 6.19.0 |
+| **Authentication** | Better Auth 1.3.34 (Email/Password + Google OAuth) |
+| **State Management** | Zustand 5.0.8 (persistent) + TanStack Query 5.90.8 (async) |
+| **UI Components** | shadcn/ui + Radix UI primitives |
+| **Styling** | Tailwind CSS 4 + Framer Motion 12.23.24 |
+| **Forms** | React Hook Form 7.66.0 + Zod 4.1.12 |
+| **Maps** | Mapbox GL 3.16.0 |
+| **AI Chat** | Google Generative AI (Gemini 2.5 Flash) |
+| **File Storage** | Supabase Storage |
+| **Realtime** | Supabase Realtime (broadcast channels) |
+| **Email** | Resend 6.5.2 |
+| **Charts** | Recharts 2.15.4 |
+| **Mobile** | Capacitor 7.4.4 (Android) |
+| **Package Manager** | Bun (recommended) |
+
+## Prerequisites
+
+- **Node.js** 20.x or later
 - **Bun** (recommended) or npm/pnpm/yarn
 - **PostgreSQL** database (local or cloud)
 - **Git**
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/Rogenecarl/nextjs16-prisma-better-auth-starterkit.git
-cd nextjs16-prisma-better-auth-starterkit
+git clone <repository-url>
+cd himsog
 ```
 
 ### 2. Install Dependencies
@@ -50,246 +83,293 @@ cd nextjs16-prisma-better-auth-starterkit
 bun install
 # or
 npm install
-# or
-pnpm install
-# or
-yarn install
 ```
 
 ### 3. Set Up Environment Variables
 
-Create a `.env` file in the root directory and add the following:
+Create a `.env` file based on `example.env`:
 
 ```env
 # Database
-DATABASE_URL="postgresql://user:password@localhost:5432/mydb"
-DIRECT_URL="postgresql://user:password@localhost:5432/mydb"
+DATABASE_URL="postgresql://user:password@localhost:5432/himsog"
+DIRECT_URL="postgresql://user:password@localhost:5432/himsog"
 
-# Better Auth
+# Authentication
 BETTER_AUTH_SECRET="your-super-secret-key-min-32-chars"
 BETTER_AUTH_URL="http://localhost:3000"
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
+# Maps
+NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN="your-mapbox-token"
+
+# AI Chatbot
+GEMINI_API_KEY="your-gemini-api-key"
+
+# File Storage & Realtime (Supabase)
+NEXT_PUBLIC_SUPABASE_URL="your-supabase-url"
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY="your-supabase-key"
+
+# Email
+RESEND_API_KEY="your-resend-api-key"
 
 # Google OAuth (Optional)
 GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
 ```
 
-**Important:** Replace the placeholder values with your actual credentials.
-
 ### 4. Set Up the Database
 
-Run Prisma migrations to create database tables:
+Run Prisma migrations:
 
 ```bash
 bunx prisma migrate dev
-# or
-npx prisma migrate dev
 ```
 
 Generate Prisma Client:
 
 ```bash
 bunx prisma generate
-# or
-npx prisma generate
 ```
 
-### 5. Run the Development Server
+### 5. Seed Sample Data (Optional)
+
+```bash
+bun run seed:providers-v2   # Seed provider data
+bun run seed:bookings       # Seed booking data
+bun run seed:insurance      # Seed insurance providers
+bun run seed:analytics      # Seed analytics data
+```
+
+### 6. Run the Development Server
 
 ```bash
 bun dev
-# or
-npm run dev
-# or
-pnpm dev
-# or
-yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## 📁 Project Structure
+## Project Structure
 
 ```
-project-himsog-next-16/
+himsog/
+├── .github/workflows/          # CI/CD pipeline (Azure deployment)
+├── android/                    # Capacitor Android project
+├── docs/                       # Project documentation
 ├── prisma/
-│   ├── schema.prisma          # Database schema
-│   └── migrations/            # Database migrations
+│   ├── schema.prisma           # Database schema (23 models)
+│   ├── migrations/             # Database migrations
+│   └── seed-*.ts               # Seeding scripts
+├── public/                     # Static assets
 ├── src/
-│   ├── actions/
-│   │   └── auth/              # Server actions for authentication
-│   │       ├── auth-actions.ts
-│   │       └── google-auth-actions.ts
-│   ├── app/                   # Next.js App Router
-│   │   ├── auth/              # Authentication pages
-│   │   ├── provider/          # Provider dashboard
-│   │   └── api/               # API routes
+│   ├── actions/                # Server Actions ("use server")
+│   │   ├── admin/              # Admin operations
+│   │   ├── appointment/        # Appointment management
+│   │   ├── auth/               # Authentication
+│   │   ├── messages/           # Messaging
+│   │   ├── notifications/      # Notifications
+│   │   ├── provider/           # Provider operations
+│   │   └── review/             # Reviews
+│   ├── app/                    # Next.js App Router
+│   │   ├── (landingpage)/      # Landing page
+│   │   ├── (map)/              # Map feature
+│   │   ├── (message)/          # Messaging
+│   │   ├── (public)/           # Public routes (browse, provider details)
+│   │   ├── (users)/            # User dashboard
+│   │   ├── admin/              # Admin dashboard
+│   │   ├── api/                # API routes
+│   │   │   ├── auth/           # Better Auth handler
+│   │   │   ├── chat/           # AI chatbot endpoint
+│   │   │   └── mobile/         # Mobile API endpoints
+│   │   ├── auth/               # Authentication pages
+│   │   └── provider/           # Provider dashboard & onboarding
 │   ├── components/
-│   │   ├── auth/              # Authentication forms
-│   │   ├── ui/                # shadcn/ui components
-│   │   └── provider-components/
+│   │   ├── admin-components/   # Admin UI
+│   │   ├── auth/               # Auth forms
+│   │   ├── landingpage/        # Landing page components
+│   │   ├── map/                # Map components
+│   │   ├── messages/           # Messaging UI
+│   │   ├── provider-components/# Provider UI
+│   │   ├── ui/                 # shadcn/ui components
+│   │   └── users/              # User components
+│   ├── context/                # React Context (Query, User)
+│   ├── hooks/                  # Custom React hooks (use-*.ts)
 │   ├── lib/
-│   │   ├── auth.ts            # Better Auth configuration
-│   │   ├── prisma.ts          # Prisma client
-│   │   └── utils/             # Utility functions
-│   ├── schemas/               # Zod validation schemas
-│   ├── types/                 # TypeScript type definitions
-│   └── context/               # React context providers
-└── public/                    # Static assets
+│   │   ├── auth.ts             # Better Auth configuration
+│   │   ├── prisma.ts           # Prisma client
+│   │   ├── gemini.ts           # Gemini AI configuration
+│   │   ├── supabase-client.ts  # Supabase storage client
+│   │   └── generated/prisma/   # Prisma generated client
+│   ├── schemas/                # Zod validation schemas
+│   ├── store/                  # Zustand stores
+│   └── types/                  # TypeScript types
+├── capacitor.config.ts         # Mobile app configuration
+├── CLAUDE.md                   # Development guide
+└── package.json
 ```
 
-## 🎭 User Roles
-
-The application supports three user roles with different access levels:
+## User Roles
 
 | Role | Description | Default Route |
 |------|-------------|---------------|
-| **USER** | Regular user with basic access | `/find-services` |
-| **PROVIDER** | Service provider with extended features | `/provider/dashboard` |
-| **ADMIN** | Administrator with full access | `/admin/dashboard` |
+| **USER** | Patients seeking healthcare services | `/browse-services` |
+| **PROVIDER** | Healthcare service providers | `/provider/dashboard` |
+| **ADMIN** | Platform administrators | `/admin/dashboard` |
 
-### Role-Based Redirection
+Users are automatically redirected to their role-specific dashboard after login.
 
-After successful login, users are automatically redirected based on their role:
-- Admin → `/admin/dashboard`
-- Provider → `/provider/dashboard`
-- User → `/find-services`
+## Database Models
 
-## 🔐 Authentication Features
+**Core Models:**
+- `User`, `Session`, `Account`, `Verification`
 
-- ✅ Email/Password authentication
-- ✅ Google OAuth (optional)
-- ✅ Role-based access control
-- ✅ Automatic role-based redirects
-- ✅ Secure session management
-- ✅ Password validation
-- ✅ Email verification ready
-- ✅ Protected routes
+**Provider Models:**
+- `Provider`, `Category`, `Service`, `ServicePackage`, `OperatingHour`, `BreakTime`
 
-## 📝 Available Scripts
+**Insurance:**
+- `InsuranceProvider`, `ServiceInsurance`
+
+**Appointments:**
+- `Appointment`, `AppointmentService`
+
+**Communication:**
+- `Notification`, `Conversation`, `Message`
+
+**Reviews:**
+- `Review`, `ReviewLike`
+
+**Documents:**
+- `Document` (verification documents)
+
+**Admin:**
+- `AuditLog`, `ProviderStatusHistory`, `SystemFeedback`
+
+## API Routes
+
+| Route | Description |
+|-------|-------------|
+| `/api/auth/[...all]` | Better Auth handler (all authentication) |
+| `/api/chat` | AI chatbot endpoint (Gemini) |
+| `/api/mobile/auth/*` | Mobile authentication endpoints |
+| `/api/mobile/user/*` | Mobile user data endpoints |
+
+## Available Scripts
 
 ```bash
 # Development
-bun dev              # Start development server
-bun build            # Build for production
-bun start            # Start production server
+bun dev                       # Start development server
+bun build                     # Build for production
+bun start                     # Start production server
+bun lint                      # Run ESLint
 
 # Database
-bunx prisma studio   # Open Prisma Studio (database GUI)
-bunx prisma migrate dev  # Run migrations
-bunx prisma generate # Generate Prisma Client
+bunx prisma studio            # Open Prisma Studio (database GUI)
+bunx prisma migrate dev       # Run migrations (development)
+bunx prisma migrate deploy    # Deploy migrations (production)
+bunx prisma generate          # Generate Prisma client
 
-# Code Quality
-bun run lint         # Run ESLint
-bun run type-check   # TypeScript type checking
+# Seeding
+bun run seed:providers-v2     # Seed provider data
+bun run seed:bookings         # Seed booking data
+bun run seed:insurance        # Seed insurance providers
+bun run seed:analytics        # Seed analytics data
 ```
 
-## 🔧 Configuration
+## Deployment
 
-### Database Schema
-
-The project uses Prisma with the following main models:
-- `User` - User accounts with role field
-- `Session` - User sessions
-- `Account` - OAuth accounts
-- `Verification` - Email verification tokens
-
-### Adding New Roles
-
-1. Update the `UserRole` enum in `prisma/schema.prisma`:
-```prisma
-enum UserRole {
-  USER
-  ADMIN
-  PROVIDER
-  YOUR_NEW_ROLE  // Add here
-}
-```
-
-2. Update the redirect map in `src/actions/auth/auth-actions.ts`:
-```typescript
-const redirectMap = {
-  ADMIN: "/admin/dashboard",
-  PROVIDER: "/provider/dashboard",
-  USER: "/find-services",
-  YOUR_NEW_ROLE: "/your-route",  // Add here
-} as const;
-```
-
-3. Run migration:
-```bash
-bunx prisma migrate dev --name add_new_role
-```
-
-## 🎨 Customization
-
-### Styling
-
-The project uses Tailwind CSS. Customize colors and themes in:
-- `tailwind.config.ts` - Tailwind configuration
-- `src/app/globals.css` - Global styles
-
-### UI Components
-
-All UI components are from shadcn/ui and located in `src/components/ui/`. Customize them as needed.
-
-## 🚢 Deployment
-
-### Deploy to Vercel
-
-1. Push your code to GitHub
-2. Import project to [Vercel](https://vercel.com)
-3. Add environment variables
-4. Deploy
+### Platform
+- **Hosting:** Azure App Service (Linux, Node.js 20)
+- **Database:** Azure PostgreSQL Flexible Server
+- **Storage:** Supabase Storage
+- **CI/CD:** GitHub Actions
 
 ### Environment Variables for Production
 
-Ensure all environment variables are set in your deployment platform:
-- `DATABASE_URL` - Production database URL
-- `DIRECT_URL` - Direct database connection
-- `BETTER_AUTH_SECRET` - Secure random string (min 32 chars)
-- `BETTER_AUTH_URL` - Your production URL
-- OAuth credentials (if using)
+All environment variables from the `.env` section are required, with production URLs:
 
-## 📚 Learn More
+```env
+BETTER_AUTH_URL="https://your-domain.com"
+NEXT_PUBLIC_APP_URL="https://your-domain.com"
+```
 
-### Documentation
+### Build Configuration
 
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Prisma Documentation](https://www.prisma.io/docs)
-- [Better Auth Documentation](https://www.better-auth.com/docs)
-- [shadcn/ui Documentation](https://ui.shadcn.com)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+The project uses Next.js standalone output for Azure App Service deployment:
 
-### Key Concepts
+```typescript
+// next.config.ts
+output: "standalone"
+```
 
-- **Server Actions** - Modern data mutations without API routes
-- **Type-Safe Forms** - React Hook Form + Zod validation
-- **Role-Based Auth** - Multi-role authentication system
-- **Optimized Queries** - Minimal database calls for performance
+## Architecture Patterns
 
-## 🤝 Contributing
+### Server Actions
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+All mutations use Server Actions in `/src/actions/`. Return type: `ActionResponse<T>`
+
+```typescript
+const result = await createAppointment(data);
+if (result.success) {
+  // handle result.data
+} else {
+  // handle result.error
+}
+```
+
+### Supabase Usage
+
+Supabase is used **only** for:
+- **Storage:** File uploads (cover photos, documents) to `HimsogStorage` bucket
+- **Realtime:** Broadcast channels for chat messaging
+
+**Not used for:** Database or authentication (handled by Prisma and Better Auth)
+
+### Zustand Stores
+
+Persistent stores with localStorage:
+- `useOnboardingCreateProviderProfileStore` - Provider onboarding form
+- `useCreateUserAppointmentStore` - Appointment booking form
+
+## Mobile App
+
+The project includes a Capacitor-based Android app:
+
+```typescript
+// capacitor.config.ts
+appId: "tech.himsog.app"
+appName: "Himsog"
+```
+
+Mobile API endpoints are available at `/api/mobile/*` with JWT authentication.
+
+## Naming Conventions
+
+| Type | Convention | Example |
+|------|------------|---------|
+| Server Actions | `*-actions.ts` | `appointment-actions.ts` |
+| Hooks | `use-*.ts` | `use-appointment.ts` |
+| Stores | `*-store.ts` | `appointment-store.ts` |
+| Schemas | `*.schema.ts` | `appointment.schema.ts` |
+| Components | PascalCase | `AppointmentCard.tsx` |
+
+## Documentation
+
+Additional documentation available in `/docs/`:
+- `AZURE-DEPLOYMENT-GUIDE.md` - Deployment instructions
+- `PRD-ADMIN-FEATURES.md` - Admin feature specifications
+- `PRD-PROVIDER-FEATURES.md` - Provider feature specifications
+
+## Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License.
 
-## 🐛 Issues
-
-If you encounter any issues, please [open an issue](https://github.com/Rogenecarl/nextjs16-prisma-better-auth-starterkit/issues) on GitHub.
-
-## ⭐ Show Your Support
-
-If this project helped you, please give it a ⭐️!
-
 ---
 
-**Built with ❤️ using Next.js 16, Prisma, and Better Auth**
+**Built with Next.js 16, Prisma, Better Auth, and Supabase**
