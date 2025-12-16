@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { AppointmentStatus } from "@/lib/generated/prisma"
-import { Loader2, Calendar, Clock, Mail, Check, X } from "lucide-react"
+import { Loader2, Calendar, Clock, Check, X, Eye, Phone, Hash, FileText, CreditCard, User } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -35,12 +35,14 @@ interface AppointmentCardProps {
     endTime: Date
     status: AppointmentStatus
     totalPrice: number
+    notes?: string | null
     services?: Array<{
       service: {
         id: string
         name: string
         description: string | null
       }
+      priceAtBooking?: number
     }>
   }
   onApprove: (id: string) => void
@@ -53,6 +55,8 @@ interface AppointmentCardProps {
   isSelected?: boolean
   onSelect?: (id: string) => void
   showCheckbox?: boolean
+  // Highlight prop for calendar navigation
+  isHighlighted?: boolean
 }
 
 export function AppointmentCard({
@@ -66,9 +70,11 @@ export function AppointmentCard({
   isSelected = false,
   onSelect,
   showCheckbox = false,
+  isHighlighted = false,
 }: AppointmentCardProps) {
   const [showCompleteDialog, setShowCompleteDialog] = useState(false)
   const [showCancelDialog, setShowCancelDialog] = useState(false)
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false)
   const [activityNotes, setActivityNotes] = useState("")
   const [cancelReason, setCancelReason] = useState("")
   const [cancelNotes, setCancelNotes] = useState("")
@@ -147,8 +153,53 @@ export function AppointmentCard({
     })
   }
 
-  const serviceName = appointment.services?.[0]?.service?.name || "Service"
+  const serviceCount = appointment.services?.length || 0
   const isPending = appointment.status === "PENDING"
+
+  const getStatusBadgeForDialog = (status: AppointmentStatus) => {
+    const statusConfig = {
+      PENDING: {
+        bg: "bg-orange-50 dark:bg-orange-950/50",
+        text: "text-orange-700 dark:text-orange-300",
+        border: "border-orange-100 dark:border-orange-800",
+        dot: "bg-orange-500",
+      },
+      CONFIRMED: {
+        bg: "bg-blue-50 dark:bg-blue-950/50",
+        text: "text-blue-700 dark:text-blue-300",
+        border: "border-blue-100 dark:border-blue-800",
+        dot: "bg-blue-500",
+      },
+      COMPLETED: {
+        bg: "bg-green-50 dark:bg-green-950/50",
+        text: "text-green-700 dark:text-green-300",
+        border: "border-green-100 dark:border-green-800",
+        dot: "bg-green-500",
+      },
+      CANCELLED: {
+        bg: "bg-gray-50 dark:bg-gray-800/50",
+        text: "text-gray-600 dark:text-gray-400",
+        border: "border-gray-200 dark:border-gray-700",
+        dot: "bg-gray-400",
+      },
+      NO_SHOW: {
+        bg: "bg-red-50 dark:bg-red-950/50",
+        text: "text-red-600 dark:text-red-400",
+        border: "border-red-200 dark:border-red-800",
+        dot: "bg-red-500",
+      },
+    }
+
+    const config = statusConfig[status]
+    return (
+      <span
+        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${config.bg} ${config.text} ${config.border}`}
+      >
+        <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`}></span>
+        {status.replace("_", " ")}
+      </span>
+    )
+  }
 
   const getStatusBadge = () => {
     const statusConfig = {
@@ -187,8 +238,11 @@ export function AppointmentCard({
 
   return (
     <div
-      className={`bg-white dark:bg-[#1E293B] rounded-xl border shadow-sm hover:shadow-md transition-shadow duration-300 p-5 mb-4 group ${
-        isSelected
+      id={`appointment-${appointment.id}`}
+      className={`bg-white dark:bg-[#1E293B] rounded-xl border shadow-sm hover:shadow-md transition-all duration-300 p-5 mb-4 group ${
+        isHighlighted
+          ? "border-cyan-500 dark:border-cyan-400 ring-2 ring-cyan-500/30 dark:ring-cyan-400/30 animate-pulse"
+          : isSelected
           ? "border-cyan-500 dark:border-cyan-400 ring-1 ring-cyan-500/20 dark:ring-cyan-400/20"
           : "border-gray-200 dark:border-white/10"
       }`}
@@ -205,96 +259,82 @@ export function AppointmentCard({
           </div>
         )}
 
-        {/* User Info */}
-        <div className="flex items-start gap-4 md:w-1/3">
-          <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center border-2 border-gray-100 dark:border-gray-700 shadow-sm">
-            <span className="text-indigo-700 dark:text-indigo-300 font-bold text-lg">
+        {/* Patient Info */}
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center border-2 border-gray-100 dark:border-gray-700 shadow-sm shrink-0">
+            <span className="text-indigo-700 dark:text-indigo-300 font-bold text-base">
               {appointment.patientName.charAt(0).toUpperCase()}
             </span>
           </div>
-          <div>
-            <h4 className="font-bold text-gray-900 dark:text-white text-lg leading-tight">
+          <div className="min-w-0">
+            <h4 className="font-semibold text-gray-900 dark:text-white text-base leading-tight truncate">
               {appointment.patientName}
             </h4>
-            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
-              <Mail className="w-3.5 h-3.5 mr-1.5" />
-              <a
-                href={`mailto:${appointment.patientEmail}`}
-                className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-              >
-                {appointment.patientEmail}
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Appointment Details */}
-        <div className="flex flex-col gap-2 md:w-1/3">
-          <div className="flex items-center">
-            <span className="bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-xs font-semibold px-2.5 py-0.5 rounded border border-indigo-100 dark:border-indigo-800 truncate max-w-[200px]">
-              {serviceName}
-            </span>
-            <span className="ml-3 text-sm font-bold text-gray-700 dark:text-gray-300">
-              ₱{appointment.totalPrice}
-            </span>
-          </div>
-
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
-            <div className="flex items-center">
-              <Calendar className="w-4 h-4 mr-1.5 text-gray-400 dark:text-gray-500" />
-              <span>{formatDate(appointment.startTime)}</span>
-            </div>
-            <div className="flex items-center">
-              <Clock className="w-4 h-4 mr-1.5 text-gray-400 dark:text-gray-500" />
-              <span>
-                {formatTime(appointment.startTime)} - {formatTime(appointment.endTime)}
-              </span>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+              <div className="flex items-center">
+                <Calendar className="w-3.5 h-3.5 mr-1 text-gray-400 dark:text-gray-500" />
+                <span>{formatDate(appointment.startTime)}</span>
+              </div>
+              <div className="flex items-center">
+                <Clock className="w-3.5 h-3.5 mr-1 text-gray-400 dark:text-gray-500" />
+                <span>{formatTime(appointment.startTime)}</span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Actions */}
-        {isPending ? (
-          <div className="flex flex-col sm:flex-row gap-3 md:w-auto w-full mt-2 md:mt-0">
-            {onCancel && (
-              <button
-                onClick={() => setShowCancelDialog(true)}
-                disabled={isCancelling}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/30 hover:bg-rose-100 dark:hover:bg-rose-900/50 border border-transparent transition-colors focus:ring-2 focus:ring-rose-500 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <X className="w-4 h-4" />
-                Cancel
-              </button>
-            )}
-            <button
-              onClick={() => onApprove(appointment.id)}
-              disabled={isApproving}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-medium text-white bg-green-600 hover:bg-green-700 shadow-sm shadow-green-200 dark:shadow-green-900/30 transition-all transform active:scale-95 focus:ring-2 focus:ring-green-500 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isApproving ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Check className="w-4 h-4" />
+        <div className="flex items-center gap-2 shrink-0">
+          {/* View Details Button */}
+          <button
+            onClick={() => setShowDetailsDialog(true)}
+            className="flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+            title="View details"
+          >
+            <Eye className="w-4.5 h-4.5" />
+          </button>
+
+          {isPending ? (
+            <div className="flex items-center gap-2">
+              {onCancel && (
+                <button
+                  onClick={() => setShowCancelDialog(true)}
+                  disabled={isCancelling}
+                  className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/30 hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <X className="w-4 h-4" />
+                  <span className="hidden sm:inline">Cancel</span>
+                </button>
               )}
-              {isApproving ? "Approving..." : "Approve"}
-            </button>
-          </div>
-        ) : (
-          <div className="md:w-auto w-full flex flex-col sm:flex-row items-end sm:items-center gap-3 justify-end">
-            {getStatusBadge()}
-            {/* Mark as Complete button for CONFIRMED appointments */}
-            {appointment.status === "CONFIRMED" && onStatusChange && (
               <button
-                onClick={() => setShowCompleteDialog(true)}
-                disabled={isCompleting}
-                className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-transparent transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => onApprove(appointment.id)}
+                disabled={isApproving}
+                className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white bg-green-600 hover:bg-green-700 shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Check className="w-4 h-4" />
-                Mark as Complete
+                {isApproving ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Check className="w-4 h-4" />
+                )}
+                <span className="hidden sm:inline">{isApproving ? "Approving..." : "Approve"}</span>
               </button>
-            )}
-          </div>
-        )}
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              {getStatusBadge()}
+              {appointment.status === "CONFIRMED" && onStatusChange && (
+                <button
+                  onClick={() => setShowCompleteDialog(true)}
+                  disabled={isCompleting}
+                  className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Check className="w-4 h-4" />
+                  <span className="hidden sm:inline">Complete</span>
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Complete Appointment Dialog */}
@@ -408,6 +448,213 @@ export function AppointmentCard({
                 "Cancel Appointment"
               )}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Appointment Details Dialog */}
+      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              Appointment Details
+            </DialogTitle>
+            <DialogDescription>
+              Complete information for this appointment
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* Status and Appointment Number */}
+            <div className="flex items-center justify-between">
+              {getStatusBadgeForDialog(appointment.status)}
+              <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
+                <Hash className="w-4 h-4" />
+                <span className="font-mono">{appointment.appointmentNumber}</span>
+              </div>
+            </div>
+
+            {/* Patient Information */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <User className="w-4 h-4 text-gray-400" />
+                Patient Information
+              </h4>
+              <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Name</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    {appointment.patientName}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Email</span>
+                  <a
+                    href={`mailto:${appointment.patientEmail}`}
+                    className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+                  >
+                    {appointment.patientEmail}
+                  </a>
+                </div>
+                {appointment.patientPhone && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Phone</span>
+                    <a
+                      href={`tel:${appointment.patientPhone}`}
+                      className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                      {appointment.patientPhone}
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Schedule */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-gray-400" />
+                Schedule
+              </h4>
+              <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Date</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    {formatDate(appointment.startTime)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Time</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    {formatTime(appointment.startTime)} - {formatTime(appointment.endTime)}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Services */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <FileText className="w-4 h-4 text-gray-400" />
+                Services ({serviceCount})
+              </h4>
+              <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 space-y-3">
+                {appointment.services?.map((s, index) => (
+                  <div
+                    key={s.service.id}
+                    className={`flex items-start justify-between ${
+                      index !== 0 ? "pt-3 border-t border-gray-200 dark:border-gray-700" : ""
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {s.service.name}
+                      </p>
+                      {s.service.description && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">
+                          {s.service.description}
+                        </p>
+                      )}
+                    </div>
+                    {s.priceAtBooking !== undefined && (
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300 ml-4">
+                        ₱{s.priceAtBooking.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Total */}
+            <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+                <CreditCard className="w-4 h-4 text-gray-400" />
+                Total Amount
+              </div>
+              <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400">
+                ₱{appointment.totalPrice.toLocaleString()}
+              </span>
+            </div>
+
+            {/* Notes */}
+            {appointment.notes && (
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-gray-400" />
+                  Patient Notes
+                </h4>
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                    {appointment.notes}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowDetailsDialog(false)}
+              className="w-full sm:w-auto"
+            >
+              Close
+            </Button>
+
+            {/* Action buttons based on status */}
+            {isPending && (
+              <>
+                {onCancel && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowDetailsDialog(false)
+                      setShowCancelDialog(true)
+                    }}
+                    className="w-full sm:w-auto text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800 hover:bg-rose-50 dark:hover:bg-rose-900/30"
+                  >
+                    <X className="w-4 h-4 mr-1.5" />
+                    Cancel Appointment
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  onClick={() => {
+                    onApprove(appointment.id)
+                    setShowDetailsDialog(false)
+                  }}
+                  disabled={isApproving}
+                  className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
+                >
+                  {isApproving ? (
+                    <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                  ) : (
+                    <Check className="w-4 h-4 mr-1.5" />
+                  )}
+                  {isApproving ? "Approving..." : "Approve"}
+                </Button>
+              </>
+            )}
+
+            {appointment.status === "CONFIRMED" && onStatusChange && (
+              <Button
+                type="button"
+                onClick={() => {
+                  setShowDetailsDialog(false)
+                  setShowCompleteDialog(true)
+                }}
+                disabled={isCompleting}
+                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
+              >
+                <Check className="w-4 h-4 mr-1.5" />
+                Mark as Complete
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -1,18 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { getWeekStart, getDaysInMonth, getFirstDayOfMonth } from "./date-utils";
 import { AppointmentStatus } from "@/lib/generated/prisma";
-import { Phone, MessageSquare, ChevronLeft, ChevronRight } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
 
 interface Appointment {
   id: string;
@@ -87,8 +80,13 @@ export default function DayView({
   appointments = [],
   operatingHours = [],
 }: DayViewProps) {
-  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const router = useRouter();
   const [miniCalendarDate, setMiniCalendarDate] = useState(new Date(currentDate));
+
+  // Navigate to appointments page when clicking an appointment
+  const handleAppointmentClick = (appointmentId: string) => {
+    router.push(`/provider/appointments?highlight=${appointmentId}`);
+  };
 
   const dayName = currentDate.toLocaleString("en-US", { weekday: "long" });
   const date = currentDate.getDate();
@@ -247,7 +245,7 @@ export default function DayView({
                     return (
                       <div
                         key={apt.id}
-                        onClick={() => setSelectedAppointment(apt)}
+                        onClick={() => handleAppointmentClick(apt.id)}
                         className={`p-3 rounded-lg border cursor-pointer hover:shadow-md transition-all ${config.bg} ${config.text} ${config.border} mb-2`}
                       >
                         <div className="flex items-start justify-between">
@@ -389,7 +387,7 @@ export default function DayView({
                 return (
                   <div
                     key={apt.id}
-                    onClick={() => setSelectedAppointment(apt)}
+                    onClick={() => handleAppointmentClick(apt.id)}
                     className={`p-3 rounded-lg border cursor-pointer hover:shadow-sm transition-all ${config.bg} ${config.border}`}
                   >
                     <div className="flex items-center justify-between">
@@ -435,129 +433,6 @@ export default function DayView({
         </div>
       </div>
 
-      {/* Appointment Details Modal */}
-      <Dialog open={!!selectedAppointment} onOpenChange={() => setSelectedAppointment(null)}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-slate-900 dark:text-white">Appointment Details</DialogTitle>
-          </DialogHeader>
-          {selectedAppointment && (
-            <div className="space-y-4">
-              {/* Patient Info */}
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-cyan-100 dark:bg-cyan-900/50 flex items-center justify-center">
-                  <span className="text-cyan-700 dark:text-cyan-300 font-bold text-lg">
-                    {selectedAppointment.patientName.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-lg text-slate-900 dark:text-white">
-                    {selectedAppointment.patientName}
-                  </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {selectedAppointment.patientEmail}
-                  </p>
-                  {selectedAppointment.patientPhone && (
-                    <p className="text-sm text-slate-600 dark:text-slate-400">
-                      {selectedAppointment.patientPhone}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Status Badge */}
-              <div>
-                <Badge
-                  variant="secondary"
-                  className={statusConfig[selectedAppointment.status as keyof typeof statusConfig]?.badge || ""}
-                >
-                  {selectedAppointment.status}
-                </Badge>
-              </div>
-
-              {/* Appointment Details */}
-              <div className="space-y-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4">
-                <div className="flex justify-between">
-                  <span className="text-slate-600 dark:text-slate-400">Date</span>
-                  <span className="font-medium text-slate-900 dark:text-white">
-                    {new Date(selectedAppointment.startTime).toLocaleDateString("en-US", {
-                      weekday: "short",
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric"
-                    })}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-600 dark:text-slate-400">Time</span>
-                  <span className="font-medium text-slate-900 dark:text-white">
-                    {new Date(selectedAppointment.startTime).toLocaleTimeString("en-US", {
-                      hour: "numeric",
-                      minute: "2-digit",
-                      hour12: true,
-                    })} - {new Date(selectedAppointment.endTime).toLocaleTimeString("en-US", {
-                      hour: "numeric",
-                      minute: "2-digit",
-                      hour12: true,
-                    })}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-600 dark:text-slate-400">Services</span>
-                  <span className="font-medium text-slate-900 dark:text-white text-right max-w-[200px]">
-                    {selectedAppointment.services?.map(s => s.service.name).join(", ") || "N/A"}
-                  </span>
-                </div>
-                <div className="flex justify-between border-t border-slate-200 dark:border-white/10 pt-3">
-                  <span className="text-slate-600 dark:text-slate-400 font-medium">Total</span>
-                  <span className="font-bold text-lg text-cyan-600 dark:text-cyan-400">
-                    ₱{selectedAppointment.totalPrice.toLocaleString("en-PH", { minimumFractionDigits: 2 })}
-                  </span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-2">
-                {selectedAppointment.patientPhone && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                    asChild
-                  >
-                    <a href={`tel:${selectedAppointment.patientPhone}`}>
-                      <Phone className="w-4 h-4 mr-2" />
-                      Call
-                    </a>
-                  </Button>
-                )}
-                {selectedAppointment.user?.id && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                    asChild
-                  >
-                    <Link href={`/message?userId=${selectedAppointment.user.id}`}>
-                      <MessageSquare className="w-4 h-4 mr-2" />
-                      Message
-                    </Link>
-                  </Button>
-                )}
-                <Button
-                  size="sm"
-                  className="flex-1 bg-cyan-600 hover:bg-cyan-700"
-                  asChild
-                >
-                  <Link href={`/provider/appointments?id=${selectedAppointment.id}`}>
-                    View Full Details
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

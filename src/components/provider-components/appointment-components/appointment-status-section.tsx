@@ -35,12 +35,14 @@ interface AppointmentStatusSectionProps {
     endTime: Date
     status: AppointmentStatus
     totalPrice: number
+    notes?: string | null
     services?: Array<{
       service: {
         id: string
         name: string
         description: string | null
       }
+      priceAtBooking?: number
     }>
   }>
   onApprove: (id: string) => void
@@ -53,6 +55,8 @@ interface AppointmentStatusSectionProps {
   selectedIds?: string[]
   onSelect?: (id: string) => void
   showCheckboxes?: boolean
+  // Highlight prop for calendar navigation
+  highlightedId?: string | null
 }
 
 export function AppointmentStatusSection({
@@ -74,6 +78,7 @@ export function AppointmentStatusSection({
   selectedIds = [],
   onSelect,
   showCheckboxes = false,
+  highlightedId,
 }: AppointmentStatusSectionProps) {
   const sectionAppointments = appointments.filter((apt) => apt.status === status)
 
@@ -112,6 +117,7 @@ export function AppointmentStatusSection({
                 isSelected={selectedIds.includes(apt.id)}
                 onSelect={onSelect}
                 showCheckbox={showCheckboxes}
+                isHighlighted={highlightedId === apt.id}
               />
             ))}
           </div>

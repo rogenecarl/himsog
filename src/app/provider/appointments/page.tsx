@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { AppointmentStatusSection } from "@/components/provider-components/appointment-components/appointment-status-section";
 import { BulkActionsBar } from "@/components/provider-components/appointment-components/bulk-actions-bar";
 import { Button } from "@/components/ui/button";
@@ -19,14 +20,8 @@ import { AppointmentStatus } from "@/lib/generated/prisma";
 import { CalendarDays, Clock, CheckCircle2, XCircle, LayoutList, CalendarCheck, AlertCircle } from "lucide-react";
 
 export default function AppointmentsPage() {
-  const [dateRange, setDateRange] = useState("today");
-  const [approvingId, setApprovingId] = useState<string | null>(null);
-  const [completingId, setCompletingId] = useState<string | null>(null);
-  const [cancellingId, setCancellingId] = useState<string | null>(null);
-
-  // Bulk selection state
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [bulkMode, setBulkMode] = useState(false);
+  const searchParams = useSearchParams();
+  const highlightParam = searchParams.get("highlight");
 
   // Use timestamps to avoid infinite re-renders
   const getTodayTimestamp = () => {
@@ -35,7 +30,27 @@ export default function AppointmentsPage() {
     return date.getTime();
   };
 
-  const [startTimestamp, setStartTimestamp] = useState(getTodayTimestamp());
+  const getThirtyDaysAgoTimestamp = () => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() - 30);
+    return date.getTime();
+  };
+
+  // Initialize date range based on highlight param (30 days if highlighting)
+  const [dateRange, setDateRange] = useState(() => highlightParam ? "30days" : "today");
+  const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [completingId, setCompletingId] = useState<string | null>(null);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [highlightedId, setHighlightedId] = useState<string | null>(() => highlightParam);
+
+  // Bulk selection state
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkMode, setBulkMode] = useState(false);
+
+  const [startTimestamp, setStartTimestamp] = useState(() =>
+    highlightParam ? getThirtyDaysAgoTimestamp() : getTodayTimestamp()
+  );
   const [endTimestamp, setEndTimestamp] = useState(getTodayTimestamp());
 
   // Convert timestamps to dates for the queries
@@ -55,6 +70,25 @@ export default function AppointmentsPage() {
 
   const updateStatusMutation = useUpdateAppointmentStatus();
   const cancelMutation = useCancelAppointment();
+
+  // Scroll to highlighted appointment when data loads and clear highlight after delay
+  useEffect(() => {
+    if (highlightedId && appointments.length > 0 && !isLoadingAppointments) {
+      const appointmentElement = document.getElementById(`appointment-${highlightedId}`);
+      if (appointmentElement) {
+        setTimeout(() => {
+          appointmentElement.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 100);
+      }
+
+      // Clear highlight after 5 seconds
+      const timer = setTimeout(() => {
+        setHighlightedId(null);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [highlightedId, appointments, isLoadingAppointments]);
 
   const handleDateRangeClick = (range: string) => {
     const today = new Date();
@@ -423,6 +457,7 @@ export default function AppointmentsPage() {
               selectedIds={selectedIds}
               onSelect={handleSelectAppointment}
               showCheckboxes={bulkMode}
+              highlightedId={highlightedId}
             />
 
             <AppointmentStatusSection
@@ -442,6 +477,7 @@ export default function AppointmentsPage() {
               completingId={completingId}
               cancellingId={cancellingId}
               selectedIds={selectedIds}
+              highlightedId={highlightedId}
               onSelect={handleSelectAppointment}
               showCheckboxes={bulkMode}
             />

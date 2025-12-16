@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { getDaysInMonth, getFirstDayOfMonth } from "./date-utils";
 import { AppointmentStatus } from "@/lib/generated/prisma";
 
@@ -23,7 +24,13 @@ interface MonthViewProps {
 }
 
 export default function MonthView({ currentDate, appointments = [] }: MonthViewProps) {
+  const router = useRouter();
   const monthStart = getFirstDayOfMonth(currentDate);
+
+  // Navigate to appointments page when clicking an appointment
+  const handleAppointmentClick = (appointmentId: string) => {
+    router.push(`/provider/appointments?highlight=${appointmentId}`);
+  };
   const daysInMonth = getDaysInMonth(currentDate);
   const daysInPrevMonth = getDaysInMonth(
     new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
@@ -125,7 +132,8 @@ export default function MonthView({ currentDate, appointments = [] }: MonthViewP
                   return (
                     <div
                       key={apt.id}
-                      className={`text-xs p-1.5 rounded border ${statusColor} truncate cursor-pointer hover:shadow-sm transition-shadow`}
+                      onClick={() => handleAppointmentClick(apt.id)}
+                      className={`text-xs p-1.5 rounded border ${statusColor} truncate cursor-pointer hover:shadow-sm hover:opacity-80 transition-all`}
                       title={`${apt.patientName} - ${apt.services?.[0]?.service?.name || "Service"}`}
                     >
                       <div className="font-semibold truncate">{time}</div>
@@ -134,7 +142,10 @@ export default function MonthView({ currentDate, appointments = [] }: MonthViewP
                   );
                 })}
                 {dayAppointments.length > 3 && (
-                  <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">
+                  <div
+                    onClick={() => router.push("/provider/appointments")}
+                    className="text-xs text-slate-600 dark:text-slate-400 font-medium cursor-pointer hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
+                  >
                     +{dayAppointments.length - 3} more
                   </div>
                 )}
