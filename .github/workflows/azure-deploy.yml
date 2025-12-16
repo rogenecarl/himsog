@@ -35,6 +35,12 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DATABASE_URL }}
 
+      - name: Run database migrations
+        run: bunx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DATABASE_URL }}
+
       - name: Build Next.js app
         run: bun run build
         env:
