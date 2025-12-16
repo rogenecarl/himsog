@@ -1,6 +1,5 @@
 "use client"
 
-import { signInWithGoogle } from "@/actions/auth/google-auth-actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -82,7 +81,7 @@ export function SignInForm() {
                 variant="outline"
                 type="button"
                 className="w-full h-11 font-medium bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-slate-200 transition-all duration-200 cursor-pointer group"
-                onClick={signInWithGoogle}
+                onClick={() => authClient.signIn.social({ provider: "google" })}
             >
                 <svg className="h-5 w-5 mr-3 transition-transform duration-200 group-hover:scale-110" viewBox="0 0 24 24">
                     <path
