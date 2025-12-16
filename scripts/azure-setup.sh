@@ -12,7 +12,7 @@ APP_NAME="himsog"     # Must be globally unique, change if taken
 DB_SERVER_NAME="himsog-db-server"  # Must be globally unique
 DB_NAME="himsog"
 DB_ADMIN_USER="himsogadmin"
-DB_ADMIN_PASSWORD="ChangeThisPassword123!"  # CHANGE THIS!
+DB_ADMIN_PASSWORD="Bajig123%40"  # CHANGE THIS!
 
 echo "============================================"
 echo "Setting up Azure resources for Himsog"

@@ -215,17 +215,21 @@ const ServiceCard: React.FC<{
           <div className="text-right">
             <p
               className={`font-bold text-sm ${
-                service.type === "PACKAGE"
-                  ? "text-purple-600 dark:text-purple-400"
-                  : "text-blue-600 dark:text-blue-400"
+                service.pricingModel === "INQUIRE"
+                  ? "text-gray-500 dark:text-slate-400 italic"
+                  : service.type === "PACKAGE"
+                    ? "text-purple-600 dark:text-purple-400"
+                    : "text-blue-600 dark:text-blue-400"
               }`}
             >
               {service.pricingModel === "FIXED"
                 ? `₱${service.fixedPrice.toLocaleString()}`
-                : `₱${service.priceMin.toLocaleString()} - ₱${service.priceMax.toLocaleString()}`}
+                : service.pricingModel === "RANGE"
+                  ? `₱${service.priceMin.toLocaleString()} - ₱${service.priceMax.toLocaleString()}`
+                  : "Price upon inquiry"}
             </p>
             <p className="text-[10px] text-gray-400 dark:text-slate-500">
-              {service.pricingModel === "RANGE" ? "Est. Range" : "Fixed Price"}
+              {service.pricingModel === "FIXED" ? "Fixed Price" : service.pricingModel === "RANGE" ? "Est. Range" : "Contact for pricing"}
             </p>
           </div>
         </div>

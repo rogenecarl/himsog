@@ -229,7 +229,7 @@ export const ProviderServiceFormSection: React.FC<FormSectionProps> = ({
         {/* Pricing Configuration */}
         <div className="space-y-4">
           <label className="text-sm font-semibold text-slate-700 block">Pricing Model</label>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap gap-4 md:gap-6">
             <label className="flex items-center gap-2 cursor-pointer group">
               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${formData.pricingModel === PricingModel.FIXED ? 'border-indigo-600' : 'border-slate-300 group-hover:border-indigo-400'}`}>
                 {formData.pricingModel === PricingModel.FIXED && <div className="w-2.5 h-2.5 rounded-full bg-indigo-600" />}
@@ -256,57 +256,78 @@ export const ProviderServiceFormSection: React.FC<FormSectionProps> = ({
               />
               <span className="text-slate-700 font-medium">Price Range</span>
             </label>
+            <label className="flex items-center gap-2 cursor-pointer group">
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${formData.pricingModel === PricingModel.INQUIRE ? 'border-indigo-600' : 'border-slate-300 group-hover:border-indigo-400'}`}>
+                {formData.pricingModel === PricingModel.INQUIRE && <div className="w-2.5 h-2.5 rounded-full bg-indigo-600" />}
+              </div>
+              <input
+                type="radio"
+                name="pricingModel"
+                className="hidden"
+                checked={formData.pricingModel === PricingModel.INQUIRE}
+                onChange={() => updateField('pricingModel', PricingModel.INQUIRE)}
+              />
+              <span className="text-slate-700 font-medium">No Price</span>
+            </label>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mt-2">
-            {formData.pricingModel === PricingModel.FIXED ? (
-              <div className="col-span-2 relative">
-                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-slate-500 dark:text-slate-400">₱</span>
-                </div>
-                <input
-                  type="number"
-                  min="0"
-                  step="1"
-                  value={formData.fixedPrice}
-                  onChange={(e) => updateField('fixedPrice', parseInt(e.target.value) || '')}
-                  placeholder="0"
-                  className="w-full pl-8 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                />
-              </div>
-            ) : (
-              <>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="text-slate-500 dark:text-slate-400 text-xs font-medium">MIN</span>
-                  </div>
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={formData.minPrice}
-                    onChange={(e) => updateField('minPrice', parseInt(e.target.value) || '')}
-                    placeholder="0"
-                    className="w-full pl-12 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                  />
-                </div>
-                <div className="relative">
+          {formData.pricingModel !== PricingModel.INQUIRE && (
+            <div className="grid grid-cols-2 gap-4 mt-2">
+              {formData.pricingModel === PricingModel.FIXED ? (
+                <div className="col-span-2 relative">
                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="text-slate-500 dark:text-slate-400 text-xs font-medium">MAX</span>
+                    <span className="text-slate-500 dark:text-slate-400">₱</span>
                   </div>
                   <input
                     type="number"
                     min="0"
                     step="1"
-                    value={formData.maxPrice}
-                    onChange={(e) => updateField('maxPrice', parseInt(e.target.value) || '')}
+                    value={formData.fixedPrice}
+                    onChange={(e) => updateField('fixedPrice', parseInt(e.target.value) || '')}
                     placeholder="0"
-                    className="w-full pl-12 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full pl-8 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
                   />
                 </div>
-              </>
-            )}
-          </div>
+              ) : (
+                <>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span className="text-slate-500 dark:text-slate-400 text-xs font-medium">MIN</span>
+                    </div>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={formData.minPrice}
+                      onChange={(e) => updateField('minPrice', parseInt(e.target.value) || '')}
+                      placeholder="0"
+                      className="w-full pl-12 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                    />
+                  </div>
+                  <div className="relative">
+                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span className="text-slate-500 dark:text-slate-400 text-xs font-medium">MAX</span>
+                    </div>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={formData.maxPrice}
+                      onChange={(e) => updateField('maxPrice', parseInt(e.target.value) || '')}
+                      placeholder="0"
+                      className="w-full pl-12 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {formData.pricingModel === PricingModel.INQUIRE && (
+            <div className="mt-2 p-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg">
+              <p className="text-sm text-slate-600 dark:text-slate-400">Price will be shown as &quot;Price upon inquiry&quot; to patients.</p>
+            </div>
+          )}
         </div>
 
         {/* Insurance Selection */}

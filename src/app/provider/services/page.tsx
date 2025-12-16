@@ -184,10 +184,12 @@ export default function ServiceManagement() {
                 })
                 .map((service) => {
                 const isPackage = service.type === 'PACKAGE';
-                const priceDisplay = service.pricingModel === 'FIXED' 
+                const priceDisplay = service.pricingModel === 'FIXED'
                   ? `₱${formatPrice(service.fixedPrice || service.priceMin)}`
-                  : `₱${formatPrice(service.priceMin)} - ₱${formatPrice(service.priceMax)}`;
-                
+                  : service.pricingModel === 'RANGE'
+                    ? `₱${formatPrice(service.priceMin)} - ₱${formatPrice(service.priceMax)}`
+                    : 'Price upon inquiry';
+
                 return (
                   <Card
                     key={service.id}
