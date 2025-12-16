@@ -182,7 +182,8 @@ export type ServiceType = (typeof ServiceType)[keyof typeof ServiceType]
 
 export const PricingModel: {
   FIXED: 'FIXED',
-  RANGE: 'RANGE'
+  RANGE: 'RANGE',
+  INQUIRE: 'INQUIRE'
 };
 
 export type PricingModel = (typeof PricingModel)[keyof typeof PricingModel]

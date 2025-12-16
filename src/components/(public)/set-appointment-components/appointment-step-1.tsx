@@ -5,6 +5,7 @@ import { Check, Package, Stethoscope, Shield } from "lucide-react"
 import { useCreateUserAppointmentStore } from "@/store/create-user-appointment-store"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import type { ServiceType, PricingModel } from "@/lib/generated/prisma"
 
 interface Provider {
   id: string
@@ -13,8 +14,8 @@ interface Provider {
     id: string
     name: string
     description: string | null
-    type: 'SINGLE' | 'PACKAGE'
-    pricingModel: 'FIXED' | 'RANGE'
+    type: ServiceType
+    pricingModel: PricingModel
     fixedPrice: number
     priceMin: number
     priceMax: number
@@ -64,10 +65,14 @@ export default function AppointmentStep1({ provider }: AppointmentStep1Props) {
       setServices(selectedServices.filter((s) => s.id !== service.id))
     } else {
       // Calculate price based on pricing model
-      const price = service.pricingModel === 'FIXED' 
-        ? service.fixedPrice 
-        : service.priceMin; // Use minimum price for range pricing
-      
+      let price = 0;
+      if (service.pricingModel === 'FIXED') {
+        price = service.fixedPrice;
+      } else if (service.pricingModel === 'RANGE') {
+        price = service.priceMin; // Use minimum price for range pricing
+      }
+      // For INQUIRE pricing, price remains 0
+
       setServices([
         ...selectedServices,
         {
@@ -142,12 +147,19 @@ export default function AppointmentStep1({ provider }: AppointmentStep1Props) {
                 {/* Price */}
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-gray-500 dark:text-slate-400">
-                    {service.pricingModel === 'FIXED' ? 'Fixed Price:' : 'Price Range:'}
+                    {service.pricingModel === 'FIXED' ? 'Fixed Price:' : service.pricingModel === 'RANGE' ? 'Price Range:' : 'Price:'}
                   </span>
-                  <span className="font-semibold text-green-600 dark:text-green-400">
-                    {service.pricingModel === 'FIXED' 
+                  <span className={cn(
+                    "font-semibold",
+                    service.pricingModel === 'INQUIRE'
+                      ? "text-gray-500 dark:text-slate-400 italic"
+                      : "text-green-600 dark:text-green-400"
+                  )}>
+                    {service.pricingModel === 'FIXED'
                       ? `₱${service.fixedPrice.toLocaleString()}`
-                      : `₱${service.priceMin.toLocaleString()} - ₱${service.priceMax.toLocaleString()}`
+                      : service.pricingModel === 'RANGE'
+                        ? `₱${service.priceMin.toLocaleString()} - ₱${service.priceMax.toLocaleString()}`
+                        : 'Price upon inquiry'
                     }
                   </span>
                 </div>

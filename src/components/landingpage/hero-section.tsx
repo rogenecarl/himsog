@@ -104,13 +104,6 @@ const Hero: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="mt-auto p-4 bg-linear-to-br from-slate-50 to-slate-100 dark:from-white/5 dark:to-white/0 rounded-xl border border-slate-200 dark:border-white/5">
-                  <div className="flex items-center gap-2 mb-2 text-blue-600 dark:text-blue-400">
-                    <Zap className="w-4 h-4 fill-current" />
-                    <span className="font-bold text-xs">Premium Access</span>
-                  </div>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed">Verified clinics and priority booking enabled.</p>
-                </div>
               </div>
 
               {/* Main Map/Content Area */}
@@ -161,11 +154,11 @@ const Hero: React.FC = () => {
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                   </div>
                   <div className="space-y-3">
+                    <div className="bg-cyan-500 p-2.5 rounded-lg rounded-br-none text-xs text-white ml-auto w-fit">
+                      Find Healthcare Provider.
+                    </div>
                     <div className="bg-slate-100 dark:bg-black/20 p-2.5 rounded-lg rounded-tl-none text-xs text-slate-600 dark:text-slate-300">
                       Found 3 clinics open now near you.
-                    </div>
-                    <div className="bg-cyan-500 p-2.5 rounded-lg rounded-br-none text-xs text-white ml-auto w-fit">
-                      Book the nearest one.
                     </div>
                   </div>
                 </motion.div>

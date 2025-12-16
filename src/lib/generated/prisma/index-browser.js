@@ -459,7 +459,8 @@ exports.ServiceType = exports.$Enums.ServiceType = {
 
 exports.PricingModel = exports.$Enums.PricingModel = {
   FIXED: 'FIXED',
-  RANGE: 'RANGE'
+  RANGE: 'RANGE',
+  INQUIRE: 'INQUIRE'
 };
 
 exports.AppointmentStatus = exports.$Enums.AppointmentStatus = {

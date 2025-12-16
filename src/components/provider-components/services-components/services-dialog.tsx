@@ -136,8 +136,8 @@ export default function ServiceDialog({
     const serviceData: {
       name: string;
       description?: string;
-      type: 'SINGLE' | 'PACKAGE';
-      pricingModel: 'FIXED' | 'RANGE';
+      type: ServiceType;
+      pricingModel: PricingModel;
       acceptedInsurances: string[];
       isActive: boolean;
       fixedPrice?: number;
@@ -154,7 +154,12 @@ export default function ServiceDialog({
     };
 
     // Handle pricing based on model
-    if (data.pricingModel === PricingModel.FIXED) {
+    if (data.pricingModel === PricingModel.INQUIRE) {
+      // No price validation needed for INQUIRE
+      serviceData.fixedPrice = 0;
+      serviceData.priceMin = 0;
+      serviceData.priceMax = 0;
+    } else if (data.pricingModel === PricingModel.FIXED) {
       const fixedPrice =
         typeof data.fixedPrice === "number"
           ? data.fixedPrice

@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { calculateDistance } from "@/lib/distance-utils";
-import { ProviderStatus } from "@/lib/generated/prisma";
+import { ProviderStatus, ServiceType, PricingModel } from "@/lib/generated/prisma";
 import type { Provider } from "@/schemas/provider.schema";
 import type { Decimal } from "@prisma/client/runtime/library";
 
@@ -30,8 +30,8 @@ type PrismaProviderWithLocation = {
     id: string;
     name: string;
     description: string | null;
-    type: 'SINGLE' | 'PACKAGE';
-    pricingModel: 'FIXED' | 'RANGE';
+    type: ServiceType;
+    pricingModel: PricingModel;
     fixedPrice: number;
     priceMin: number;
     priceMax: number;
@@ -51,8 +51,8 @@ export interface MapProvider extends Pick<Provider, 'id' | 'healthcareName' | 'd
     id: string;
     name: string;
     description?: string | null;
-    type: 'SINGLE' | 'PACKAGE';
-    pricingModel: 'FIXED' | 'RANGE';
+    type: ServiceType;
+    pricingModel: PricingModel;
     fixedPrice: number;
     priceMin?: number;
     priceMax?: number;

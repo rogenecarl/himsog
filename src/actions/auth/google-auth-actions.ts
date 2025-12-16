@@ -5,3 +5,10 @@ export const signInWithGoogle = async () => {
         provider: "google"
     })
 }
+
+export const signInWithGoogleAsProvider = async () => {
+    await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/api/auth/provider-google-callback"
+    })
+}

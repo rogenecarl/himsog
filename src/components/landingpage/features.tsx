@@ -17,25 +17,25 @@ const Features: React.FC = () => {
             >
                 Features Overview
             </motion.div>
-            <motion.h2 
+            <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
                 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white mb-8 tracking-tight"
             >
-                Everything you need for <br/>
-                <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-purple-600">better health.</span>
+                Find the right care, <br/>
+                <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-purple-600">right where you are.</span>
             </motion.h2>
-            <motion.p 
+            <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
                 className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed"
             >
-                Connect with hospitals, dentists, vets, and specialists in one unified platform. 
-                Experience the future of healthcare management.
+                Discover verified hospitals, clinics, and specialists on our interactive map.
+                Book appointments instantly, message providers directly, and take control of your healthcare journey.
             </motion.p>
         </div>
 

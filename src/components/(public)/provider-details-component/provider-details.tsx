@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import type { Provider } from "@/schemas/provider.schema";
 import type { Category } from "@/schemas/category.schema";
 import type { OperatingHour } from "@/schemas/scheduling.schema";
+import type { ServiceType, PricingModel } from "@/lib/generated/prisma";
 import {
   Star,
   MapPin,
@@ -71,8 +72,8 @@ export type ProviderDetails = Pick<
     id: string;
     name: string;
     description: string | null;
-    type: "SINGLE" | "PACKAGE";
-    pricingModel: "FIXED" | "RANGE";
+    type: ServiceType;
+    pricingModel: PricingModel;
     fixedPrice: number;
     priceMin: number;
     priceMax: number;

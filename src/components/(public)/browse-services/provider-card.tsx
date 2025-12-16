@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, memo } from "react";
 import type { Category } from "@/schemas/category.schema";
+import type { ServiceType, PricingModel } from "@/lib/generated/prisma";
 
 interface Provider {
   id: string;
@@ -24,8 +25,8 @@ interface Provider {
     id: string;
     name: string;
     description: string | null;
-    type: 'SINGLE' | 'PACKAGE';
-    pricingModel: 'FIXED' | 'RANGE';
+    type: ServiceType;
+    pricingModel: PricingModel;
     fixedPrice: number;
     priceMin: number;
     priceMax: number;

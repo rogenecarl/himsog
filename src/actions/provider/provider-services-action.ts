@@ -4,13 +4,14 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
+import type { ServiceType, PricingModel } from "@/lib/generated/prisma";
 
 // Create a new service
 export async function createService(data: {
   name: string;
   description?: string;
-  type: 'SINGLE' | 'PACKAGE';
-  pricingModel: 'FIXED' | 'RANGE';
+  type: ServiceType;
+  pricingModel: PricingModel;
   fixedPrice?: number;
   priceMin?: number;
   priceMax?: number;
@@ -149,8 +150,8 @@ export async function updateService(
   data: {
     name?: string;
     description?: string;
-    type?: 'SINGLE' | 'PACKAGE';
-    pricingModel?: 'FIXED' | 'RANGE';
+    type?: ServiceType;
+    pricingModel?: PricingModel;
     fixedPrice?: number;
     priceMin?: number;
     priceMax?: number;

@@ -485,8 +485,10 @@ export default function OnboardingStep2ServicesForm() {
                                                             <p className="font-semibold text-slate-900 dark:text-white text-sm">
                                                                 {service.pricingModel === PricingModel.FIXED ? (
                                                                     `₱${service.fixedPrice.toLocaleString()}`
-                                                                ) : (
+                                                                ) : service.pricingModel === PricingModel.RANGE ? (
                                                                     `₱${service.priceMin.toLocaleString()} - ₱${service.priceMax.toLocaleString()}`
+                                                                ) : (
+                                                                    <span className="text-slate-500 italic">Price upon inquiry</span>
                                                                 )}
                                                             </p>
                                                             <div className="mt-2 flex gap-1.5 justify-end opacity-0 group-hover:opacity-100 transition-opacity">

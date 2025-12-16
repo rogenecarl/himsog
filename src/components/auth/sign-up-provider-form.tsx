@@ -1,6 +1,6 @@
 "use client"
 
-import { signInWithGoogle } from "@/actions/auth/google-auth-actions"
+import { signInWithGoogleAsProvider } from "@/actions/auth/google-auth-actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
@@ -181,7 +181,7 @@ export function SignupProviderForm() {
                 variant="outline"
                 type="button"
                 className="w-full h-11 font-medium bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
-                onClick={signInWithGoogle}
+                onClick={signInWithGoogleAsProvider}
             >
                 <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
                     <path

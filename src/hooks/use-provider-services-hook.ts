@@ -11,6 +11,7 @@ import {
 } from "@/actions/provider/provider-services-action";
 import { toast } from "sonner";
 import { providerQueryKeys, queryConfigDefaults } from "@/lib/query-keys";
+import type { ServiceType, PricingModel } from "@/lib/generated/prisma";
 
 /**
  * Hook to fetch provider services
@@ -44,8 +45,8 @@ export function useCreateService() {
     mutationFn: async (data: {
       name: string;
       description?: string;
-      type: 'SINGLE' | 'PACKAGE';
-      pricingModel: 'FIXED' | 'RANGE';
+      type: ServiceType;
+      pricingModel: PricingModel;
       fixedPrice?: number;
       priceMin?: number;
       priceMax?: number;
@@ -85,8 +86,8 @@ export function useUpdateService() {
       data: {
         name?: string;
         description?: string;
-        type?: 'SINGLE' | 'PACKAGE';
-        pricingModel?: 'FIXED' | 'RANGE';
+        type?: ServiceType;
+        pricingModel?: PricingModel;
         fixedPrice?: number;
         priceMin?: number;
         priceMax?: number;

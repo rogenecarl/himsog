@@ -11,9 +11,6 @@ export default function Logo() {
         <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-none transition-colors">
           Himsog
         </span>
-        <span className="text-[10px] font-medium text-cyan-600 dark:text-cyan-400 tracking-wide uppercase transition-colors">
-          Healthcare
-        </span>
       </div>
     </Link>
   );

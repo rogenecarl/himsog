@@ -66,7 +66,7 @@ const CreateProviderServiceSchema = z.object({
   name: z.string().min(1, { message: "Service name is required" }).max(255),
   description: z.string().max(1000).optional().nullable(),
   type: z.enum(['SINGLE', 'PACKAGE']).default('SINGLE'),
-  pricingModel: z.enum(['FIXED', 'RANGE']).default('FIXED'),
+  pricingModel: z.enum(['FIXED', 'RANGE', 'INQUIRE']).default('FIXED'),
   fixedPrice: z.number().int().min(0, { message: "Fixed price must be 0 or greater" }).default(0),
   priceMin: z.number().int().min(0, { message: "Minimum price must be 0 or greater" }).default(0),
   priceMax: z.number().int().min(0, { message: "Maximum price must be 0 or greater" }).default(0),

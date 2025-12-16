@@ -6,6 +6,7 @@ import mapboxgl from "mapbox-gl";
 import { MapProvider } from "@/hooks/use-map";
 import { MapPin, Phone, Mail, Star, Package, Stethoscope } from "lucide-react";
 import { toast } from "sonner";
+import type { ServiceType, PricingModel } from "@/lib/generated/prisma";
 
 interface ProviderPopupProps {
   map: mapboxgl.Map;
@@ -121,12 +122,15 @@ function ProviderPopup({
   }, [activeProvider, map, userLocation, onGetDirections, portalContainer]);
 
   const formatPrice = (service: {
-    type: 'SINGLE' | 'PACKAGE';
-    pricingModel: 'FIXED' | 'RANGE';
+    type: ServiceType;
+    pricingModel: PricingModel;
     fixedPrice: number;
     priceMin?: number;
     priceMax?: number;
   }) => {
+    if (service.pricingModel === 'INQUIRE') {
+      return "Price upon inquiry";
+    }
     if (service.pricingModel === 'FIXED') {
       return service.fixedPrice > 0 ? `₱${service.fixedPrice.toLocaleString()}` : "Contact for pricing";
     } else {
