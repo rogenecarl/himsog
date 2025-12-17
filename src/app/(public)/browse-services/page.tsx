@@ -66,6 +66,19 @@ function FindServicesContent() {
     parseInt(searchParams.get("page") || "1", 10)
   );
   const [showRecommendations, setShowRecommendations] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  // Handle click outside to close recommendations (more reliable than onBlur)
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setShowRecommendations(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Debounced search for server-side filtering
   const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
@@ -173,6 +186,13 @@ function FindServicesContent() {
     // Scroll to top of results
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [searchQuery, selectedCategory, updateURL]);
+
+  // Handle recommendation selection - updates both search input and URL params
+  const handleRecommendationSelect = useCallback((query: string) => {
+    setSearchQuery(query);
+    setShowRecommendations(false);
+    updateURL(query, selectedCategory, 1, true);
+  }, [selectedCategory, updateURL]);
 
   // Server-side filtering - no need for client-side useMemo
   // providers array is already filtered from the server
@@ -286,8 +306,8 @@ function FindServicesContent() {
 
       {/* Search Bar with Recommendations */}
       <div className="w-full px-4 sm:px-6 lg:px-8 pb-4 sm:pb-6 pt-4 sm:pt-0">
-        <div className="mx-auto max-w-3xl flex flex-col w-full relative">
-          <Search className="absolute left-4 sm:left-5 top-1/2 h-4 w-4 sm:h-5 sm:w-5 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
+        <div ref={searchContainerRef} className="mx-auto max-w-3xl flex flex-col w-full relative">
+          <Search className="absolute left-4 sm:left-5 top-1/2 h-4 w-4 sm:h-5 sm:w-5 -translate-y-1/2 text-gray-400 dark:text-slate-500 z-10" />
           <Input
             placeholder={
               selectedCategory
@@ -300,7 +320,6 @@ function FindServicesContent() {
             onFocus={() =>
               searchQuery.length >= 2 && setShowRecommendations(true)
             }
-            onBlur={() => setTimeout(() => setShowRecommendations(false), 200)}
           />
 
           {showRecommendations &&
@@ -322,11 +341,7 @@ function FindServicesContent() {
                           ]) => (
                             <button
                               key={serviceName}
-                              onClick={() => {
-                                setSearchQuery(serviceName);
-                                updateURL(serviceName, selectedCategory, 1, true);
-                                setShowRecommendations(false);
-                              }}
+                              onClick={() => handleRecommendationSelect(serviceName)}
                               className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-white/5"
                             >
                               <Stethoscope
@@ -359,11 +374,7 @@ function FindServicesContent() {
                           (providerName: string) => (
                             <button
                               key={providerName}
-                              onClick={() => {
-                                setSearchQuery(providerName);
-                                updateURL(providerName, selectedCategory, 1, true);
-                                setShowRecommendations(false);
-                              }}
+                              onClick={() => handleRecommendationSelect(providerName)}
                               className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-white/5"
                             >
                               <Search className="h-4 w-4 shrink-0 text-gray-500 dark:text-slate-400" />

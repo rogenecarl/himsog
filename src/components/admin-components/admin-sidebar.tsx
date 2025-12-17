@@ -13,6 +13,7 @@ import {
     Settings,
     User,
     UserCheck2,
+    UserCog,
 } from "lucide-react"
 
 import { AdminNavPublic } from "./admin-sidebar-public"
@@ -37,6 +38,7 @@ const data = {
         { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
         { name: "Feedback", href: "/admin/feedback", icon: MessageSquareHeart },
         { name: "Audit Log", href: "/admin/audit-log", icon: History },
+        { name: "Profile", href: "/admin/profile", icon: UserCog },
         { name: "Settings", href: "/admin/settings", icon: Settings },
     ],
     publicItems: [

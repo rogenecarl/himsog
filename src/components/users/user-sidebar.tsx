@@ -8,6 +8,7 @@ import {
   MapPin,
   MessageSquare,
   Search,
+  Settings,
 } from "lucide-react"
 
 import { UserNavGeneral } from "./user-sidebar-general"
@@ -30,6 +31,7 @@ const data = {
     { name: "My Appointments", href: "/appointments", icon: Clock },
     // { name: "My Reviews", href: "/reviews", icon: Star },
     { name: "Messages", href: "/chat", icon: MessageSquare },
+    { name: "Settings", href: "/profile", icon: Settings },
   ],
   publicItems: [
     { name: "Home", href: "/", icon: Home },

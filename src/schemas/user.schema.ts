@@ -117,6 +117,35 @@ export type ForgotPasswordInput = z.infer<typeof ForgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof ResetPasswordSchema>;
 
 // ============================================================================
+// PROFILE UPDATE SCHEMAS
+// ============================================================================
+
+// Schema for updating user name
+export const UpdateProfileNameSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters long" }),
+});
+
+// Schema for changing password
+export const ChangePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, { message: "Current password is required" }),
+    newPassword: z.string().min(8, { message: "New password must be at least 8 characters long" }),
+    confirmPassword: z.string().min(1, { message: "Please confirm your new password" }),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: "New password must be different from current password",
+    path: ["newPassword"],
+  });
+
+// Types for profile updates
+export type UpdateProfileNameInput = z.infer<typeof UpdateProfileNameSchema>;
+export type ChangePasswordInput = z.infer<typeof ChangePasswordSchema>;
+
+// ============================================================================
 // RELATIONAL TYPES (for fetching with Prisma include)
 // ============================================================================
 

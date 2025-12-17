@@ -10,7 +10,7 @@ const navItems = [
   { name: "Map", href: "/map", icon: Map },
   { name: "Search", href: "/browse-services", icon: Search, isCenter: true },
   { name: "Chat", href: "/chat", icon: MessageCircle },
-  { name: "Profile", href: "/appointments", icon: User },
+  { name: "Profile", href: "/profile", icon: User },
 ];
 
 export default function BottomNavigation() {

@@ -13,6 +13,7 @@ import {
   Search,
   Settings,
   Star,
+  UserCog,
 } from "lucide-react"
 
 import { ProviderNavGeneral } from "./sidebar-general"
@@ -38,6 +39,7 @@ const data = {
     { name: "Reviews", href: "/provider/reviews", icon: Star },
     { name: "Messages", href: "/chat", icon: MessageSquare },
     { name: "Analytics", href: "/provider/analytics", icon: BarChart3 },
+    { name: "Profile", href: "/provider/profile", icon: UserCog },
     { name: "Settings", href: "/provider/settings", icon: Settings },
   ],
   publicItems: [
