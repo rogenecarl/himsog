@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Search, MapPin, ArrowRight, Activity, Clock, Zap, Star } from 'lucide-react';
+import { Search, MapPin, ArrowRight, Activity, Clock, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Hero: React.FC = () => {

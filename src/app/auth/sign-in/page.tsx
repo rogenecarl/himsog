@@ -1,4 +1,22 @@
+import { Suspense } from "react"
 import { SignInForm } from "@/components/auth/sign-in-form"
+
+function SignInFormFallback() {
+    return (
+        <div className="w-full max-w-[400px] mx-auto">
+            <div className="flex flex-col space-y-2 text-center mb-8">
+                <div className="h-8 w-48 mx-auto bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                <div className="h-4 w-64 mx-auto bg-slate-100 dark:bg-slate-800 rounded animate-pulse" />
+            </div>
+            <div className="h-11 w-full bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse mb-6" />
+            <div className="space-y-4">
+                <div className="h-11 w-full bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse" />
+                <div className="h-11 w-full bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse" />
+                <div className="h-11 w-full bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse mt-2" />
+            </div>
+        </div>
+    )
+}
 
 export default function LoginPage() {
     return (
@@ -99,7 +117,9 @@ export default function LoginPage() {
             {/* Right Column: Visual/Marketing */}
             <div className="flex items-center justify-center p-8 lg:p-12 bg-white dark:bg-[#0B0F19]">
                 <div className="w-full max-w-[450px]">
-                    <SignInForm />
+                    <Suspense fallback={<SignInFormFallback />}>
+                        <SignInForm />
+                    </Suspense>
                 </div>
             </div>
         </div>

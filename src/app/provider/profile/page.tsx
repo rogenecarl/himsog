@@ -27,7 +27,6 @@ const tabs = [
 ];
 
 export default function ProviderProfilePage() {
-  const user = useUser();
   const [activeTab, setActiveTab] = useState<TabValue>("profile");
 
   return (
