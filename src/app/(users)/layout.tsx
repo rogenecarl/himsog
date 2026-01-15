@@ -4,6 +4,7 @@ import { ClientUserProvider } from "@/context/ClientUserProvider";
 import { ClientAppHeader } from "@/components/app-header-client";
 import { RoleGuard } from "@/components/auth/role-guard";
 import { FeedbackPopup } from "@/components/feedback/feedback-popup";
+import BottomNavigation from "@/components/mobile-bottom-nav";
 
 // Static layout - auth is handled by proxy.ts middleware (cookie check only)
 // Role validation is handled client-side via RoleGuard
@@ -28,12 +29,17 @@ export default function UserLayout({
                 <ClientAppHeader />
               </div>
 
-              {/* PAGE CONTENT */}
-              <main className="flex flex-1 flex-col gap-4 md:p-4 md:pt-0">
+              {/* PAGE CONTENT - Add bottom padding on mobile for nav */}
+              <main className="flex flex-1 flex-col gap-4 pb-20 md:pb-0 md:p-4 md:pt-0">
                 {children}
               </main>
             </SidebarInset>
           </SidebarProvider>
+
+          {/* Mobile Bottom Navigation */}
+          <div className="md:hidden">
+            <BottomNavigation />
+          </div>
 
           {/* Feedback Popup - Random survey prompt */}
           <FeedbackPopup />

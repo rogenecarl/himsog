@@ -1,5 +1,6 @@
 import Navbar from "@/components/navbar";
 import { ClientUserProvider } from "@/context/ClientUserProvider";
+import BottomNavigation from "@/components/mobile-bottom-nav";
 
 // Using ClientUserProvider allows pages to be static (no server-side auth)
 // Individual pages can override with their own dynamic setting
@@ -18,9 +19,14 @@ export default function PublicLayout({
         <div className="hidden sm:block">
           <Navbar />
         </div>
-        <main className="max-w-7xl mx-auto sm:px-6 lg:px-8 lg:pt-23 bg-white dark:bg-[#0B0F19] ">
+        <main className="max-w-7xl mx-auto pb-20 sm:pb-0 sm:px-6 lg:px-8 lg:pt-23 bg-white dark:bg-[#0B0F19]">
           {children}
         </main>
+
+        {/* Mobile Bottom Navigation */}
+        <div className="sm:hidden">
+          <BottomNavigation />
+        </div>
       </div>
     </ClientUserProvider>
   );

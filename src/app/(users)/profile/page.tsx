@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { User, Lock } from "lucide-react";
+import { User, Lock, LogOut, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
+import { useSignOut } from "@/hooks/use-auth";
 
 // Mobile components
 import MobileHeader from "@/components/mobile-header";
-import BottomNavigation from "@/components/mobile-bottom-nav";
 
 // Profile components
 import { ProfileForm } from "@/components/users/profile/profile-form";
@@ -33,6 +33,7 @@ const tabs = [
 export default function ProfilePage() {
   const user = useUser();
   const [activeTab, setActiveTab] = useState<TabValue>("profile");
+  const { handleLogout, isLoggingOut } = useSignOut();
 
   return (
     <>
@@ -69,12 +70,26 @@ export default function ProfilePage() {
         </div>
 
         {/* Mobile Content */}
-        <div className="px-5 pb-32">
+        <div className="px-5 pb-4">
           {activeTab === "profile" && <ProfileForm />}
           {activeTab === "password" && <PasswordForm />}
         </div>
 
-        <BottomNavigation />
+        {/* Sign Out Button */}
+        <div className="px-5 pb-8">
+          <button
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-medium transition-colors active:bg-red-100 dark:active:bg-red-900/30 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoggingOut ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <LogOut className="h-5 w-5" />
+            )}
+            {isLoggingOut ? "Signing out..." : "Sign out"}
+          </button>
+        </div>
       </div>
 
       {/* Desktop View */}

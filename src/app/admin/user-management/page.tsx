@@ -4,7 +4,7 @@ import { UserTable } from "@/components/admin-components/user-management";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUserStatistics } from "@/hooks/use-admin-users";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Users, UserCheck, UserMinus } from "lucide-react";
+import { Users, UserCheck } from "lucide-react";
 
 function StatCard({
   title,
@@ -69,13 +69,13 @@ export default function UserManagementPage() {
           color="text-green-600"
           isLoading={isLoading}
         />
-        <StatCard
+        {/* <StatCard
           title="Deleted Users"
           value={stats?.deletedUsers}
           icon={UserMinus}
           color="text-gray-600"
           isLoading={isLoading}
-        />
+        /> */}
       </div>
 
       {/* User Table */}

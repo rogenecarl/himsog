@@ -524,7 +524,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/home/kyousu/bajig/projects/Production/himsog/src/lib/generated/prisma",
+      "value": "/home/kyousuke/Bajig/Projects/Production/himsog/src/lib/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -538,7 +538,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/home/kyousu/bajig/projects/Production/himsog/prisma/schema.prisma",
+    "sourceFilePath": "/home/kyousuke/Bajig/Projects/Production/himsog/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -552,6 +552,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {

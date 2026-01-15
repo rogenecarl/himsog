@@ -1,5 +1,6 @@
 import Navbar from "@/components/navbar";
 import { ClientUserProvider } from "@/context/ClientUserProvider";
+import BottomNavigation from "@/components/mobile-bottom-nav";
 
 // Static layout - user data fetched client-side
 
@@ -15,7 +16,12 @@ export default function MapLayout({
                 <div className="hidden md:block">
                     <Navbar />
                 </div>
-                <main className="h-screen">{children}</main>
+                <main className="h-screen pb-16 md:pb-0">{children}</main>
+
+                {/* Mobile Bottom Navigation */}
+                <div className="md:hidden">
+                    <BottomNavigation />
+                </div>
             </div>
         </ClientUserProvider>
     );

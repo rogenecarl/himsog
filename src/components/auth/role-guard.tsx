@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useUser, useUserPending } from "@/context/UserContext";
 
 type Role = "USER" | "PROVIDER" | "ADMIN";
@@ -34,14 +34,18 @@ export function RoleGuard({ allowedRoles, children, fallback }: RoleGuardProps) 
   const user = useUser();
   const isPending = useUserPending();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     // Wait for session to load
     if (isPending) return;
 
-    // No user = don't redirect here, let middleware or sign-out hook handle it
-    // This prevents RoleGuard from interfering with logout redirects
-    if (!user) return;
+    // No user - redirect to sign in with return URL
+    if (!user) {
+      const returnUrl = encodeURIComponent(pathname);
+      router.replace(`/auth/sign-in?returnUrl=${returnUrl}`);
+      return;
+    }
 
     // Check role access
     const userRole = user.role as Role;
@@ -49,15 +53,10 @@ export function RoleGuard({ allowedRoles, children, fallback }: RoleGuardProps) 
       // Redirect to user's canonical dashboard
       router.replace(CANONICAL_DASHBOARDS[userRole] || "/");
     }
-  }, [user, isPending, allowedRoles, router]);
+  }, [user, isPending, allowedRoles, router, pathname]);
 
-  // Show fallback while loading
-  if (isPending) {
-    return fallback ?? <DefaultLoadingFallback />;
-  }
-
-  // No user - show loading (middleware will handle redirect on next navigation)
-  if (!user) {
+  // Show fallback while loading or redirecting
+  if (isPending || !user) {
     return fallback ?? <DefaultLoadingFallback />;
   }
 

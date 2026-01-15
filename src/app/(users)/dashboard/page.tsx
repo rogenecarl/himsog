@@ -16,7 +16,6 @@ import MobileNextAppointment from "@/components/users/dashboard-components/mobil
 import MobileStatsOverview from "@/components/users/dashboard-components/mobile-components/mobile-stats-overview";
 import MobileCalendarWidget from "@/components/users/dashboard-components/mobile-components/mobile-booking-calendar";
 import MobileAppointmentList from "@/components/users/dashboard-components/mobile-components/mobile-appointment-list";
-import BottomNavigation from "@/components/mobile-bottom-nav";
 
 export default function UserDashboardPage() {
     const user = useUser();
@@ -90,7 +89,7 @@ export default function UserDashboardPage() {
             )}
 
             {isLoadingAll ? (
-                <div className="px-5 pb-32 space-y-3">
+                <div className="px-5 pb-8 space-y-3">
                     {[...Array(3)].map((_, i) => (
                         <Skeleton key={i} className="h-24 rounded-2xl" />
                     ))}
@@ -101,8 +100,6 @@ export default function UserDashboardPage() {
                     appointments={allAppointments}
                 />
             )}
-
-            <BottomNavigation />
         </div>
 
         {/* Desktop View */}

@@ -12,11 +12,12 @@ import { toast } from "sonner"
 import z from "zod"
 import { Loader2, Mail, Lock } from "lucide-react" // Ensure lucide-react is installed
 import { authClient } from "@/lib/auth-client"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
 export function SignInForm() {
     const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
+    const searchParams = useSearchParams()
 
     const form = useForm<z.infer<typeof SignInSchema>>({
         resolver: zodResolver(SignInSchema),
@@ -46,6 +47,14 @@ export function SignInForm() {
             if (session?.user) {
                 toast.success("Signed in successfully", { id: toastId });
 
+                // Check for returnUrl in query params
+                const returnUrl = searchParams.get("returnUrl");
+                if (returnUrl) {
+                    router.push(decodeURIComponent(returnUrl));
+                    return;
+                }
+
+                // Default role-based redirect
                 const user = session.user as { role?: string };
                 const role = user.role || "USER";
                 const redirectMap: Record<string, string> = {
