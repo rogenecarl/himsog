@@ -229,30 +229,46 @@ const ProviderCard = memo(function ProviderCard({
           <div className="flex-1" />
 
           {/* 3. Actions Footer */}
-          <div className="grid grid-cols-2 gap-3 pt-3 mt-2 border-t border-gray-50 dark:border-white/5">
-            <Button
-              variant="outline"
-              className="w-full border-gray-200 dark:border-white/10 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                router.push(`/provider-details/${provider.id}`);
-              }}
-            >
-              Details
-            </Button>
+          {provider.category?.slug === "health-centers" ? (
+            <div className="pt-3 mt-2 border-t border-gray-50 dark:border-white/5">
+              <Button
+                variant="outline"
+                className="w-full border-gray-200 dark:border-white/10 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  router.push(`/provider-details/${provider.id}`);
+                }}
+              >
+                View Details
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 pt-3 mt-2 border-t border-gray-50 dark:border-white/5">
+              <Button
+                variant="outline"
+                className="w-full border-gray-200 dark:border-white/10 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  router.push(`/provider-details/${provider.id}`);
+                }}
+              >
+                Details
+              </Button>
 
-            <Button
-              className="w-full bg-cyan-700 hover:bg-cyan-800 text-white shadow-sm shadow-cyan-200 dark:shadow-cyan-900/20 cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                router.push(`/set-appointment/${provider.id}`);
-              }}
-            >
-              Book Now
-            </Button>
-          </div>
+              <Button
+                className="w-full bg-cyan-700 hover:bg-cyan-800 text-white shadow-sm shadow-cyan-200 dark:shadow-cyan-900/20 cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  router.push(`/set-appointment/${provider.id}`);
+                }}
+              >
+                Book Now
+              </Button>
+            </div>
+          )}
         </div>
       </Card>
     </Link>

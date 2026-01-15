@@ -206,13 +206,15 @@ const MobileProviderCard = memo(function MobileProviderCard({
 
             {/* Price and CTA */}
             <div className="flex items-center justify-between mt-auto">
-              {getPriceDisplay() && (
+              {getPriceDisplay() && provider.category?.slug !== "health-centers" && (
                 <span className="text-xs font-semibold text-teal-600">
                   {getPriceDisplay()}
                 </span>
               )}
-              <div className="flex items-center gap-1 text-teal-600">
-                <span className="text-xs font-medium">Book</span>
+              <div className="flex items-center gap-1 text-teal-600 ml-auto">
+                <span className="text-xs font-medium">
+                  {provider.category?.slug === "health-centers" ? "View Details" : "Book"}
+                </span>
                 <ChevronRight className="h-4 w-4" />
               </div>
             </div>

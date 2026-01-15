@@ -103,10 +103,11 @@ interface ProviderDetailsContentProps {
 
 // --- SUB-COMPONENTS ---
 
-const HeroSection: React.FC<{ provider: ProviderDetails; stats: ProviderRatingStats | undefined; onBack: () => void }> = ({
+const HeroSection: React.FC<{ provider: ProviderDetails; stats: ProviderRatingStats | undefined; onBack: () => void; isHealthCenter: boolean }> = ({
   provider,
   stats,
   onBack,
+  isHealthCenter,
 }) => {
   return (
     <div className="relative h-[250px] md:h-[350px] w-full group">
@@ -134,15 +135,17 @@ const HeroSection: React.FC<{ provider: ProviderDetails; stats: ProviderRatingSt
         <ArrowLeft size={20} />
       </button>
 
-      {/* Desktop Book Appointment Button */}
-      <div className="hidden md:block absolute bottom-6 right-6 lg:bottom-8 lg:right-8 z-10">
-        <Link href={`/set-appointment/${provider.id}`}>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-base px-6 py-5 rounded-xl shadow-xl shadow-blue-900/40 active:scale-[0.95] transition-all flex items-center gap-2">
-            <CalendarCheck className="w-5 h-5" />
-            Book Appointment
-          </Button>
-        </Link>
-      </div>
+      {/* Desktop Book Appointment Button - Hidden for Health Centers */}
+      {!isHealthCenter && (
+        <div className="hidden md:block absolute bottom-6 right-6 lg:bottom-8 lg:right-8 z-10">
+          <Link href={`/set-appointment/${provider.id}`}>
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-base px-6 py-5 rounded-xl shadow-xl shadow-blue-900/40 active:scale-[0.95] transition-all flex items-center gap-2">
+              <CalendarCheck className="w-5 h-5" />
+              Book Appointment
+            </Button>
+          </Link>
+        </div>
+      )}
 
       <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8 max-w-7xl mx-auto text-white">
         <div className="flex items-center gap-2 mb-3">
@@ -492,9 +495,13 @@ const QuickStats: React.FC<{ provider: ProviderDetails; stats: ProviderRatingSta
   );
 };
 
-const StickyMobileNav: React.FC<{ providerId: string; providerUserId: string }> = ({
+const StickyMobileNav: React.FC<{ providerId: string; providerUserId: string; isHealthCenter: boolean }> = ({
   providerId,
+  isHealthCenter,
 }) => {
+  // Don't render for Health Centers
+  if (isHealthCenter) return null;
+
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#1E293B] border-t border-gray-200 dark:border-white/10 p-4 md:hidden z-40 pb-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
       <Link href={`/set-appointment/${providerId}`}>
@@ -691,6 +698,9 @@ export default function ProviderDetailsContentComponent({
     new Set()
   );
 
+  // Check if provider is a Health Center
+  const isHealthCenter = provider.category?.slug === "health-centers";
+
   const handleBack = () => {
     router.back();
   };
@@ -729,7 +739,7 @@ export default function ProviderDetailsContentComponent({
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0B0F19] pb-24 md:pb-12">
-      <HeroSection provider={provider} stats={stats} onBack={handleBack} />
+      <HeroSection provider={provider} stats={stats} onBack={handleBack} isHealthCenter={isHealthCenter} />
 
       {/* Main Content Container */}
       <div className="max-w-7xl mx-auto -mt-8 relative z-10 px-4">
@@ -825,7 +835,7 @@ export default function ProviderDetailsContentComponent({
       </div>
 
       {/* Mobile Sticky Nav */}
-      <StickyMobileNav providerId={provider.id} providerUserId={provider.userId} />
+      <StickyMobileNav providerId={provider.id} providerUserId={provider.userId} isHealthCenter={isHealthCenter} />
     </div>
   );
 }
