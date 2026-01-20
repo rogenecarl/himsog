@@ -185,7 +185,8 @@ const ServiceCard: React.FC<{
   service: ProviderDetails["services"][0];
   isExpanded: boolean;
   onToggleExpand: () => void;
-}> = ({ service, isExpanded, onToggleExpand }) => {
+  isHealthCenter: boolean;
+}> = ({ service, isExpanded, onToggleExpand, isHealthCenter }) => {
   return (
     <div
       className={`rounded-xl border transition-all duration-300 ${
@@ -218,21 +219,31 @@ const ServiceCard: React.FC<{
           <div className="text-right">
             <p
               className={`font-bold text-sm ${
-                service.pricingModel === "INQUIRE"
-                  ? "text-gray-500 dark:text-slate-400 italic"
-                  : service.type === "PACKAGE"
-                    ? "text-purple-600 dark:text-purple-400"
-                    : "text-blue-600 dark:text-blue-400"
+                isHealthCenter
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : service.pricingModel === "INQUIRE"
+                    ? "text-gray-500 dark:text-slate-400 italic"
+                    : service.type === "PACKAGE"
+                      ? "text-purple-600 dark:text-purple-400"
+                      : "text-blue-600 dark:text-blue-400"
               }`}
             >
-              {service.pricingModel === "FIXED"
-                ? `₱${service.fixedPrice.toLocaleString()}`
-                : service.pricingModel === "RANGE"
-                  ? `₱${service.priceMin.toLocaleString()} - ₱${service.priceMax.toLocaleString()}`
-                  : "Price upon inquiry"}
+              {isHealthCenter
+                ? "Free"
+                : service.pricingModel === "FIXED"
+                  ? `₱${service.fixedPrice.toLocaleString()}`
+                  : service.pricingModel === "RANGE"
+                    ? `₱${service.priceMin.toLocaleString()} - ₱${service.priceMax.toLocaleString()}`
+                    : "Price upon inquiry"}
             </p>
             <p className="text-[10px] text-gray-400 dark:text-slate-500">
-              {service.pricingModel === "FIXED" ? "Fixed Price" : service.pricingModel === "RANGE" ? "Est. Range" : "Contact for pricing"}
+              {isHealthCenter
+                ? "Free Service"
+                : service.pricingModel === "FIXED"
+                  ? "Fixed Price"
+                  : service.pricingModel === "RANGE"
+                    ? "Est. Range"
+                    : "Contact for pricing"}
             </p>
           </div>
         </div>
@@ -295,7 +306,7 @@ const ServiceCard: React.FC<{
   );
 };
 
-const InfoSidebar: React.FC<{ provider: ProviderDetails }> = ({ provider }) => {
+const InfoSidebar: React.FC<{ provider: ProviderDetails; isHealthCenter: boolean }> = ({ provider, isHealthCenter }) => {
   const today = new Date().getDay(); // 0 = Sunday, 6 = Saturday
 
   // Day names in order from Sunday (0) to Saturday (6)
@@ -351,10 +362,13 @@ const InfoSidebar: React.FC<{ provider: ProviderDetails }> = ({ provider }) => {
             </div>
           </div>
 
-          <StartConversationButton
-            providerId={provider.userId}
-            className="w-full py-3 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 font-semibold rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
-          />
+          {/* Message Provider Button - Hidden for Health Centers */}
+          {!isHealthCenter && (
+            <StartConversationButton
+              providerId={provider.userId}
+              className="w-full py-3 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 font-semibold rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
+            />
+          )}
         </div>
       </div>
 
@@ -807,6 +821,7 @@ export default function ProviderDetailsContentComponent({
                             service={service}
                             isExpanded={expandedPackages.has(service.id)}
                             onToggleExpand={() => togglePackageExpand(service.id)}
+                            isHealthCenter={isHealthCenter}
                           />
                         ))}
                       </div>
@@ -829,7 +844,7 @@ export default function ProviderDetailsContentComponent({
 
           {/* RIGHT COLUMN (Span 1) */}
           <div className="space-y-6">
-            <InfoSidebar provider={provider} />
+            <InfoSidebar provider={provider} isHealthCenter={isHealthCenter} />
           </div>
         </div>
       </div>

@@ -165,3 +165,21 @@ export function useProviderById(providerId: string) {
         ...queryConfigDefaults.static, // Provider data rarely changes
     });
 }
+
+// Get health centers for the InfoBanner carousel
+export function useHealthCenters() {
+    return useQuery({
+        queryKey: [...providerKeys.all, "health-centers"],
+        queryFn: async () => {
+            const result = await getFilteredProviders({
+                categorySlug: "health-centers",
+                limit: 10, // Get up to 10 health centers for the carousel
+            });
+            if (!result.success) {
+                throw new Error(result.error);
+            }
+            return result.data || [];
+        },
+        ...queryConfigDefaults.static, // Health center data rarely changes
+    });
+}

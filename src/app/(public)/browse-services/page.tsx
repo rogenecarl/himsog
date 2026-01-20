@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import CategoryFilter from "@/components/(public)/browse-services/category-filter";
 import ProviderCardSkeleton from "@/components/(public)/browse-services/provider-card-skeleton";
 import ProviderCard from "@/components/(public)/browse-services/provider-card";
+import InfoBanner from "@/components/(public)/browse-services/info-banner";
 import { useFilteredProviders } from "@/hooks/use-create-provider-profile";
 import { useCategories } from "@/hooks/use-category";
 import BottomNavigation from "@/components/mobile-bottom-nav";
@@ -288,6 +289,9 @@ function FindServicesContent() {
           showGreeting={!!user}
         />
       </div>
+
+      {/* Health Centers Info Banner - Carousel showcasing free barangay health services */}
+      <InfoBanner />
 
       {/* Desktop Header Section */}
       <div className="hidden sm:block w-full px-4 sm:px-6 lg:px-8 pb-4 sm:pb-6">
