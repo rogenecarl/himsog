@@ -11,7 +11,8 @@
     "seed:providers-v2": "bun prisma/seed-providers-v2.ts",
     "seed:bookings": "bun prisma/seed-bookings.ts",
     "seed:insurance": "bun prisma/seed-insurance.ts",
-    "seed:analytics": "bun prisma/seed-analytics.ts"
+    "seed:analytics": "bun prisma/seed-analytics.ts",
+    "seed:bookings-provider": "bun prisma/seed-bookings-provider.ts"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.4",
