@@ -2,9 +2,13 @@
 
 import prisma from "@/lib/prisma";
 import { calculateDistance } from "@/lib/distance-utils";
-import { ProviderStatus, ServiceType, PricingModel } from "@/lib/generated/prisma";
+import { ProviderStatus, ServiceType, PricingModel } from "@/lib/generated/prisma/enums";
 import type { Provider } from "@/schemas/provider.schema";
-import type { Decimal } from "@prisma/client/runtime/library";
+import type { Prisma } from "@/lib/generated/prisma/client";
+
+// Prisma 7 exposes Decimal on the generated Prisma namespace
+// (it was previously imported from "@prisma/client/runtime/library").
+type Decimal = Prisma.Decimal;
 
 // Type for Prisma select result (matches database structure with Decimal types)
 type PrismaProviderWithLocation = {

@@ -1,11 +1,12 @@
-import {
-  PrismaClient,
-  AppointmentStatus,
-  ServiceType,
-} from "../src/lib/generated/prisma";
-import { Decimal } from "@prisma/client/runtime/library";
+import { Prisma } from "../src/lib/generated/prisma/client";
+import { AppointmentStatus, ServiceType } from "../src/lib/generated/prisma/enums";
+import prisma from "../src/lib/prisma";
 
-const prisma = new PrismaClient();
+// Prisma 7 exposes Decimal on the generated Prisma namespace
+// (it was previously imported from "@prisma/client/runtime/library").
+const Decimal = Prisma.Decimal;
+type Decimal = Prisma.Decimal;
+
 
 // ============================================================================
 // CONFIGURATION

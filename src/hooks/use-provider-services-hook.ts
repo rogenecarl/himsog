@@ -11,7 +11,7 @@ import {
 } from "@/actions/provider/provider-services-action";
 import { toast } from "sonner";
 import { providerQueryKeys, queryConfigDefaults } from "@/lib/query-keys";
-import type { ServiceType, PricingModel } from "@/lib/generated/prisma";
+import type { ServiceType, PricingModel } from "@/lib/generated/prisma/enums";
 
 /**
  * Hook to fetch provider services

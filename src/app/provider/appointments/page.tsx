@@ -16,7 +16,7 @@ import {
   useUpdateAppointmentStatus,
   useCancelAppointment,
 } from "@/hooks/use-get-provider-appointment";
-import { AppointmentStatus } from "@/lib/generated/prisma";
+import { AppointmentStatus } from "@/lib/generated/prisma/enums";
 import { CalendarDays, Clock, CheckCircle2, XCircle, LayoutList, CalendarCheck, AlertCircle } from "lucide-react";
 
 export default function AppointmentsPage() {

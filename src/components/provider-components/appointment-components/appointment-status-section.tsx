@@ -3,7 +3,7 @@
 import type React from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { AppointmentCard } from "./appointment-card"
-import { AppointmentStatus } from "@/lib/generated/prisma"
+import { AppointmentStatus } from "@/lib/generated/prisma/enums"
 
 const ClockIcon = () => (
   <svg className="h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">

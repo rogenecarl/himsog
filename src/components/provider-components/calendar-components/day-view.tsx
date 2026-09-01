@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getWeekStart, getDaysInMonth, getFirstDayOfMonth } from "./date-utils";
-import { AppointmentStatus } from "@/lib/generated/prisma";
+import { AppointmentStatus } from "@/lib/generated/prisma/enums";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 

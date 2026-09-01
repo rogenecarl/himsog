@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import { useUpdateUserRole } from "@/hooks/use-admin-users";
 import { Loader2, Shield, User, Building2 } from "lucide-react";
-import type { UserRole } from "@/lib/generated/prisma";
+import type { UserRole } from "@/lib/generated/prisma/enums";
 
 interface ChangeRoleDialogProps {
   open: boolean;

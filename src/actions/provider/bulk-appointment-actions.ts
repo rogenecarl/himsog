@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { requireProvider } from "@/actions/auth/auth-check-utils";
-import { AppointmentStatus } from "@/lib/generated/prisma";
+import { AppointmentStatus } from "@/lib/generated/prisma/enums";
 import { revalidatePath } from "next/cache";
 import { format } from "date-fns";
 

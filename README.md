@@ -90,9 +90,8 @@ npm install
 Create a `.env` file based on `example.env`:
 
 ```env
-# Database
+# Database (pooled connection string - used by both the Prisma CLI and the pg driver adapter)
 DATABASE_URL="postgresql://user:password@localhost:5432/himsog"
-DIRECT_URL="postgresql://user:password@localhost:5432/himsog"
 
 # Authentication
 BETTER_AUTH_SECRET="your-super-secret-key-min-32-chars"

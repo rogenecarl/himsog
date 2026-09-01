@@ -1,7 +1,6 @@
-import { PrismaClient, UserRole } from '@/lib/generated/prisma';
+import { UserRole } from '@/lib/generated/prisma/enums';
+import prisma from '@/lib/prisma';
 import { hashPassword } from 'better-auth/crypto';
-
-const prisma = new PrismaClient();
 
 const ADMIN_EMAIL = 'admin@admin.com';
 const ADMIN_PASSWORD = 'admin@123';

@@ -30,7 +30,7 @@ import {
   XCircle,
   AlertTriangle,
 } from "lucide-react";
-import type { ProviderStatus } from "@/lib/generated/prisma";
+import type { ProviderStatus } from "@/lib/generated/prisma/enums";
 
 interface StatusChangeDialogProps {
   open: boolean;

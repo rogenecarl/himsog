@@ -5,7 +5,7 @@ import { requireAdmin } from "../auth/auth-check-utils";
 import { createAuditLog } from "./audit-actions";
 import { AUDIT_ACTIONS } from "./audit-constants";
 import { revalidatePath } from "next/cache";
-import type { UserRole, UserStatus } from "@/lib/generated/prisma";
+import type { UserRole, UserStatus } from "@/lib/generated/prisma/enums";
 
 // ============================================================================
 // TYPES

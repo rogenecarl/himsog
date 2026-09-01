@@ -21,7 +21,7 @@ import {
   Square,
 } from "lucide-react";
 import { useBulkUpdateAppointmentStatus } from "@/hooks/use-get-provider-appointment";
-import type { AppointmentStatus } from "@/lib/generated/prisma";
+import type { AppointmentStatus } from "@/lib/generated/prisma/enums";
 
 interface BulkActionsBarProps {
   selectedIds: string[];

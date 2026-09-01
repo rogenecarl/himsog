@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import type { ServiceType, PricingModel } from "@/lib/generated/prisma";
+import type { ServiceType, PricingModel } from "@/lib/generated/prisma/enums";
 
 // Create a new service
 export async function createService(data: {

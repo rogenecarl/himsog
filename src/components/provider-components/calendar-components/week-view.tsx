@@ -1,7 +1,7 @@
 "use client";
 
 import { getWeekStart } from "./date-utils";
-import { AppointmentStatus } from "@/lib/generated/prisma";
+import { AppointmentStatus } from "@/lib/generated/prisma/enums";
 
 interface Appointment {
   id: string;

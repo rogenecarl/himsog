@@ -4,7 +4,8 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { AppointmentStatus, Prisma } from "@/lib/generated/prisma";
+import { Prisma } from "@/lib/generated/prisma/client";
+import { AppointmentStatus } from "@/lib/generated/prisma/enums";
 import { format } from "date-fns";
 import { resend, FROM_EMAIL } from "@/lib/resend";
 import {

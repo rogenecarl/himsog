@@ -9,7 +9,7 @@ import {
   getUserStatistics,
   type UserQueryParams,
 } from "@/actions/admin/user-actions";
-import type { UserRole } from "@/lib/generated/prisma";
+import type { UserRole } from "@/lib/generated/prisma/enums";
 import { toast } from "sonner";
 
 // ============================================================================

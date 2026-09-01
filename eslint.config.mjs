@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Ignore generated Prisma files:
     "src/lib/generated/**",
+    // Separate project that lives inside this directory:
+    "peaktransport/**",
   ]),
 ]);
 

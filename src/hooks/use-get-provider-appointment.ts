@@ -12,7 +12,7 @@ import {
   bulkUpdateAppointmentStatus,
   rescheduleAppointment,
 } from "@/actions/provider/bulk-appointment-actions";
-import type { AppointmentStatus } from "@/lib/generated/prisma";
+import type { AppointmentStatus } from "@/lib/generated/prisma/enums";
 import { providerQueryKeys, queryConfigDefaults } from "@/lib/query-keys";
 
 // Appointment type for optimistic updates

@@ -5,7 +5,7 @@ import { Check, Package, Stethoscope, Shield } from "lucide-react"
 import { useCreateUserAppointmentStore } from "@/store/create-user-appointment-store"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import type { ServiceType, PricingModel } from "@/lib/generated/prisma"
+import type { ServiceType, PricingModel } from "@/lib/generated/prisma/enums"
 
 interface Provider {
   id: string

@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { Prisma } from "@/lib/generated/prisma";
+import { Prisma } from "@/lib/generated/prisma/client";
 import { getCurrentUser } from "../auth/auth-check-utils";
 import { headers } from "next/headers";
 import type { CreateAuditLogParams, AuditLogQueryParams } from "./audit-constants";

@@ -80,7 +80,7 @@ import {
   toggleFeedbackResolved,
   respondToFeedback,
 } from "@/actions/feedback/feedback-actions";
-import { FeedbackCategory, FeedbackPriority } from "@/lib/generated/prisma";
+import { FeedbackCategory, FeedbackPriority } from "@/lib/generated/prisma/enums";
 import { cn } from "@/lib/utils";
 
 // Category icons and colors

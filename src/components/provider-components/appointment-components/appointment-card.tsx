@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { AppointmentStatus } from "@/lib/generated/prisma"
+import { AppointmentStatus } from "@/lib/generated/prisma/enums"
 import { Loader2, Calendar, Clock, Check, X, Eye, Phone, Hash, FileText, CreditCard, User } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"

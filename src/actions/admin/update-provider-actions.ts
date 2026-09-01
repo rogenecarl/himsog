@@ -3,7 +3,7 @@
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "../auth/auth-check-utils";
 import { revalidatePath } from "next/cache";
-import { ProviderStatus } from "@/lib/generated/prisma";
+import { ProviderStatus } from "@/lib/generated/prisma/enums";
 import { createAuditLog } from "./audit-actions";
 import { AUDIT_ACTIONS } from "./audit-constants";
 import { resend, FROM_EMAIL } from "@/lib/resend";

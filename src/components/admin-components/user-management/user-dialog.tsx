@@ -23,7 +23,7 @@ import {
   Building2,
   UserCog,
 } from "lucide-react";
-import type { UserRole, UserStatus } from "@/lib/generated/prisma";
+import type { UserRole, UserStatus } from "@/lib/generated/prisma/enums";
 
 interface UserDialogProps {
   userId: string | null;

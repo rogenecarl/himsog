@@ -9,7 +9,7 @@ import {
   updateDocumentStatus,
   type ProviderQueryParams,
 } from "@/actions/admin/update-provider-actions";
-import type { ProviderStatus } from "@/lib/generated/prisma";
+import type { ProviderStatus } from "@/lib/generated/prisma/enums";
 
 // ============================================================================
 // QUERY KEYS

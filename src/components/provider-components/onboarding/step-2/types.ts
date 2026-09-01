@@ -1,4 +1,4 @@
-import { ServiceType, PricingModel } from "@/lib/generated/prisma";
+import { ServiceType, PricingModel } from "@/lib/generated/prisma/enums";
 
 // Re-export Prisma enums for convenience
 export { ServiceType, PricingModel };

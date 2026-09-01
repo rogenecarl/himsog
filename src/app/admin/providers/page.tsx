@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState, useMemo, useCallback } from "react";
-import type { ProviderStatus } from "@/lib/generated/prisma";
+import type { ProviderStatus } from "@/lib/generated/prisma/enums";
 import { ProviderDialog } from "@/components/admin-components/provider-component/provider-dialog";
 import { ProviderTable } from "@/components/admin-components/provider-component/provider-table";
 import { Input } from "@/components/ui/input";

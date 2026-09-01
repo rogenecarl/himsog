@@ -1,6 +1,6 @@
 "use client";
 
-import type { ProviderStatus } from "@/lib/generated/prisma";
+import type { ProviderStatus } from "@/lib/generated/prisma/enums";
 import {
   Table,
   TableBody,

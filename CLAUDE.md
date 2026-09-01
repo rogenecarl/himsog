@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Healthcare geolocation platform (Himsog) built with Next.js 16, Prisma, and Better Auth. Enables users to find healthcare providers, book appointments, and communicate via messaging. Providers can manage services, schedules, and view analytics. Admins verify providers and manage categories.
 
-**Deployment:** Azure App Service + Azure PostgreSQL Flexible Server + Supabase (storage/realtime only)
+**Deployment:** Azure App Service + Neon PostgreSQL + Supabase (storage/realtime only)
 
 ## Commands
 
@@ -31,7 +31,7 @@ bun run seed:analytics     # Seed analytics data
 ## Tech Stack
 
 - **Framework:** Next.js 16 (App Router + Server Actions)
-- **Database:** PostgreSQL (Azure) with Prisma
+- **Database:** PostgreSQL (Neon) with Prisma 7 via the `@prisma/adapter-pg` driver adapter
 - **Auth:** Better Auth (email/password + Google OAuth)
 - **State:** Zustand (persistent stores) + React Query (async data)
 - **UI:** shadcn/ui + Tailwind CSS 4 + Framer Motion
@@ -126,7 +126,8 @@ Features: Appointment, AppointmentService, Review, Conversation, Message, Notifi
 ## Environment Variables
 
 Required:
-- `DATABASE_URL`, `DIRECT_URL` - PostgreSQL connection strings
+- `DATABASE_URL` - PostgreSQL connection string (pooled). Read by `prisma.config.ts` for the CLI
+  and by the `pg` Pool in `src/lib/prisma.ts` at runtime; `schema.prisma` holds no URL.
 - `BETTER_AUTH_SECRET` - Min 32 chars
 - `BETTER_AUTH_URL`, `NEXT_PUBLIC_APP_URL` - App URLs
 - `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` - Mapbox maps

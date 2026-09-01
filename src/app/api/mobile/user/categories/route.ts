@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyMobileAuth } from "@/lib/mobile-auth-middleware";
 import { handleCorsPrelight, jsonResponse } from "@/lib/cors";
-import { ProviderStatus } from "@/lib/generated/prisma";
+import { ProviderStatus } from "@/lib/generated/prisma/enums";
 
 export async function OPTIONS() {
   return handleCorsPrelight();

@@ -1,6 +1,4 @@
-import { PrismaClient } from '../src/lib/generated/prisma';
-
-const prisma = new PrismaClient();
+import prisma from '../src/lib/prisma';
 
 const insuranceProviders = [
   'PhilHealth',

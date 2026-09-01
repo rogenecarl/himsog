@@ -35,7 +35,7 @@ import {
   ChevronRight,
   Users,
 } from "lucide-react";
-import type { UserRole, UserStatus } from "@/lib/generated/prisma";
+import type { UserRole, UserStatus } from "@/lib/generated/prisma/enums";
 
 type UserFromList = {
   id: string;

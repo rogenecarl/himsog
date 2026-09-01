@@ -1,8 +1,12 @@
-import { PrismaClient, UserRole, ProviderStatus, ServiceType, PricingModel } from '@/lib/generated/prisma';
-import { Decimal } from '@prisma/client/runtime/library';
+import { Prisma } from '@/lib/generated/prisma/client';
+import { UserRole, ProviderStatus, ServiceType, PricingModel } from '@/lib/generated/prisma/enums';
+import prisma from '@/lib/prisma';
 import { hashPassword } from 'better-auth/crypto';
 
-const prisma = new PrismaClient();
+// Prisma 7 exposes Decimal on the generated Prisma namespace
+// (it was previously imported from "@prisma/client/runtime/library").
+const Decimal = Prisma.Decimal;
+type Decimal = Prisma.Decimal;
 
 // Default password for all seeded providers
 const DEFAULT_PASSWORD = 'provider@123';

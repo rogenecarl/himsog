@@ -6,7 +6,7 @@ import mapboxgl from "mapbox-gl";
 import { MapProvider } from "@/hooks/use-map";
 import { MapPin, Phone, Mail, Star, Package, Stethoscope } from "lucide-react";
 import { toast } from "sonner";
-import type { ServiceType, PricingModel } from "@/lib/generated/prisma";
+import type { ServiceType, PricingModel } from "@/lib/generated/prisma/enums";
 
 interface ProviderPopupProps {
   map: mapboxgl.Map;

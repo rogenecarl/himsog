@@ -11,7 +11,13 @@ import {
   DocumentType
 } from "@/schemas";
 import { supabase } from "@/lib/supabase-client";
-import { Decimal } from "@prisma/client/runtime/library";
+import { Prisma } from "@/lib/generated/prisma/client";
+
+// Prisma 7 exposes Decimal on the generated Prisma namespace
+// (it was previously imported from "@prisma/client/runtime/library").
+const Decimal = Prisma.Decimal;
+type Decimal = Prisma.Decimal;
+
 
 // Helper function to validate file
 function validateFile(file: File, allowedTypes: string[], maxSize: number = 6 * 1024 * 1024) {

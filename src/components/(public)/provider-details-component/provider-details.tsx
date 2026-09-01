@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import type { Provider } from "@/schemas/provider.schema";
 import type { Category } from "@/schemas/category.schema";
 import type { OperatingHour } from "@/schemas/scheduling.schema";
-import type { ServiceType, PricingModel } from "@/lib/generated/prisma";
+import type { ServiceType, PricingModel } from "@/lib/generated/prisma/enums";
 import {
   Star,
   MapPin,

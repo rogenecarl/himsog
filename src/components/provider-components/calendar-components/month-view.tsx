@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { getDaysInMonth, getFirstDayOfMonth } from "./date-utils";
-import { AppointmentStatus } from "@/lib/generated/prisma";
+import { AppointmentStatus } from "@/lib/generated/prisma/enums";
 
 interface Appointment {
   id: string;
