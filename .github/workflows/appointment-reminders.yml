@@ -1,0 +1,52 @@
+# Vercel cron jobs are limited to once per day on the Hobby plan, which cannot
+# drive this endpoint: the 1-hour reminder only looks at appointments starting
+# 50-70 minutes out, so it has to be polled far more often than daily. GitHub
+# Actions schedules are free and run at 15-minute granularity, so the reminder
+# job lives here instead of in vercel.json.
+name: Appointment reminders
+
+on:
+  schedule:
+    # Every 15 minutes - comfortably inside the 20-minute window the 1-hour
+    # reminder query uses, so a late run still catches the appointment.
+    - cron: "*/15 * * * *"
+  # Lets you fire it by hand from the Actions tab to verify the wiring.
+  workflow_dispatch:
+
+# If a run is somehow still going when the next one fires, don't stack them up.
+concurrency:
+  group: appointment-reminders
+  cancel-in-progress: false
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call reminder endpoint
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${APP_URL:-}" ] || [ -z "${CRON_SECRET:-}" ]; then
+            echo "::error::APP_URL and CRON_SECRET repository secrets must both be set."
+            exit 1
+          fi
+
+          status=$(curl --silent --show-error --location \
+            --max-time 120 \
+            --output response.json \
+            --write-out '%{http_code}' \
+            --header "Authorization: Bearer ${CRON_SECRET}" \
+            "${APP_URL%/}/api/cron/appointment-reminders")
+
+          echo "HTTP ${status}"
+          cat response.json || true
+          echo
+
+          if [ "${status}" -lt 200 ] || [ "${status}" -ge 300 ]; then
+            echo "::error::Reminder endpoint returned HTTP ${status}"
+            exit 1
+          fi

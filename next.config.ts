@@ -1,8 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Required for Azure App Service deployment
-  output: "standalone",
+  // Azure App Service needs a self-contained server bundle. Vercel builds its
+  // own output format, so leaving this on there is redundant at best - it is
+  // switched off when building on Vercel.
+  output: process.env.VERCEL ? undefined : "standalone",
 
   experimental: {
     serverActions: {
